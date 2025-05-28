@@ -32,6 +32,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('carts', CartController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 
+Route::put('/carts/{id}/quantity', [CartController::class, 'updateQuantity'])->name('carts.updateQuantity');
+Route::put('/orders/{order}/address', [OrderController::class, 'updateAddress'])->name('orders.update_address');
+Route::post('/orders/{order}/pay', [OrderController::class, 'pay'])->name('orders.pay');
+Route::get('/orders/{id}/snap-token', [OrderController::class, 'getSnapToken'])->name('orders.getSnapToken');
+Route::put('/orders/{order}/update-address', [OrderController::class, 'updateAddress'])->name('orders.update_address');
+
 // Route khusus admin
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('reviews', ReviewController::class);

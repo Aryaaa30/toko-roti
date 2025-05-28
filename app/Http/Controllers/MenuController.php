@@ -32,13 +32,10 @@ class MenuController extends Controller
     /**
      * Tampilkan detail menu (opsional).
      */
-    public function show(Menu $menu)
-    {
-        if (!auth()->user()->is_admin && !$menu->available) {
-            abort(403, 'Menu tidak tersedia.');
-        }
-        return view('menus.show', compact('menu'));
-    }
+   public function show(Menu $menu)
+{
+    return view('menus.show', compact('menu'));
+}
 
     /**
      * Tampilkan form tambah menu (hanya admin).
@@ -58,10 +55,12 @@ class MenuController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'available' => 'required|boolean',
+            'stok' => 'required|integer|min:0',
+            'kategori' => 'required|in:Roti Manis,Roti Tawar,Kue (Cake),Donat,Pastry',
             'image' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->only(['name', 'description', 'price', 'available']);
+        $data = $request->only(['name', 'description', 'price', 'available', 'stok', 'kategori']);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('menus', 'public');
@@ -90,10 +89,12 @@ class MenuController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'available' => 'required|boolean',
+            'stok' => 'required|integer|min:0',
+            'kategori' => 'required|in:Roti Manis,Roti Tawar,Kue (Cake),Donat,Pastry',
             'image' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->only(['name', 'description', 'price', 'available']);
+        $data = $request->only(['name', 'description', 'price', 'available', 'stok', 'kategori']);
 
         if ($request->hasFile('image')) {
             // Hapus gambar lama jika ada

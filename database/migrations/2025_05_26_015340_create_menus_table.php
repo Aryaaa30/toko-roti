@@ -17,10 +17,17 @@ return new class extends Migration
             $table->text('description');
             $table->decimal('price', 10, 2);
             $table->string('image')->nullable();
+            $table->integer('stok')->default(0); // Tambahkan stok
+            $table->enum('kategori', [
+                'Roti Manis',
+                'Roti Tawar',
+                'Kue (Cake)',
+                'Donat',
+                'Pastry'
+            ]); // Tambahkan enum kategori
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.

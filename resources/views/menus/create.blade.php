@@ -1,5 +1,4 @@
 <style>
-    /* CSS kamu tetap sama */
     body {
         background-color: #fffaf2;
         font-family: 'Segoe UI', sans-serif;
@@ -139,6 +138,33 @@
                 </div>
             </div>
 
+            <div class="form-grid mb-4">
+                <div>
+                    <label for="kategori">Kategori Produk</label>
+                    <select name="kategori" id="kategori" class="form-control @error('kategori') is-invalid @enderror" required>
+                        <option value="" disabled {{ old('kategori') === null ? 'selected' : '' }}>-- Pilih Kategori --</option>
+                        <option value="Roti Manis" {{ old('kategori') == 'Roti Manis' ? 'selected' : '' }}>Roti Manis</option>
+                        <option value="Roti Tawar" {{ old('kategori') == 'Roti Tawar' ? 'selected' : '' }}>Roti Tawar</option>
+                        <option value="Kue (Cake)" {{ old('kategori') == 'Kue (Cake)' ? 'selected' : '' }}>Kue (Cake)</option>
+                        <option value="Donat" {{ old('kategori') == 'Donat' ? 'selected' : '' }}>Donat</option>
+                        <option value="Pastry" {{ old('kategori') == 'Pastry' ? 'selected' : '' }}>Pastry</option>
+                    </select>
+                    @error('kategori')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="stok">Stok Produk</label>
+                    <input type="number" name="stok" id="stok" min="0"
+                        class="form-control @error('stok') is-invalid @enderror"
+                        value="{{ old('stok', 0) }}" placeholder="Masukkan jumlah stok" required>
+                    @error('stok')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
             <div class="mb-4">
                 <label for="description">Deskripsi</label>
                 <textarea name="description" id="description" rows="5"
@@ -149,7 +175,6 @@
                 @enderror
             </div>
 
-            <!-- Tambahan field available -->
             <div class="mb-4">
                 <label for="available">Status Produk</label>
                 <select name="available" id="available" class="form-control @error('available') is-invalid @enderror" required>

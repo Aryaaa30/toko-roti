@@ -8,6 +8,8 @@ use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Midtrans\Snap;
+use Midtrans\Config;
 
 class OrderController extends Controller
 {
@@ -164,4 +166,65 @@ class OrderController extends Controller
 
         return redirect()->route('orders.index')->with('success', 'Pesanan berhasil dihapus.');
     }
+
+    public function getSnapToken($id)
+{
+    $order = Order::with('items.menu')->findOrFail($id);
+
+    Config::$serverKey = config('midtrans.server_key');
+    Config::$isProduction = config('midtrans.is_production');
+    Config::$isSanitized = true;
+    Config::$is3ds = true;
+
+    $items = [];
+
+    foreach ($order->items as $item) {
+        $items[] = [
+            'id' => $item->id,
+            'price' => $item->price,
+            'quantity' => $item->quantity,
+            'name' => $item->menu->name,
+        ];
+    }
+
+    $params = [
+        'transaction_details' => [
+            'order_id' => $order->order_code,
+            'gross_amount' => $order->total_price,
+        ],
+        'item_details' => $items,
+        'customer_details' => [
+            'first_name' => 'Customer',
+            'email' => 'customer@example.com',
+            'phone' => '08123456789',
+            'shipping_address' => [
+                'address' => $order->shipping_address
+            ],
+        ],
+    ];
+
+    $snapToken = Snap::getSnapToken($params);
+
+    return response()->json([
+        'snap_token' => $snapToken
+    ]);
+}
+
+public function updateAddress(Request $request, Order $order)
+{
+    if (!auth()->user()->is_admin && $order->user_id !== auth()->id()) {
+        abort(403);
+    }
+
+    $request->validate([
+        'shipping_address' => 'required|string|max:255',
+    ]);
+
+    $order->update([
+        'shipping_address' => $request->shipping_address,
+    ]);
+
+    return redirect()->back()->with('success', 'Alamat berhasil diperbarui.');
+}
+
 }

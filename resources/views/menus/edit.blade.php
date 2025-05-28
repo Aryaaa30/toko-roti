@@ -1,5 +1,5 @@
-
 <style>
+    /* CSS sama persis seperti di create.blade */
     body {
         background-color: #fffaf2;
         font-family: 'Segoe UI', sans-serif;
@@ -97,7 +97,6 @@
             grid-template-columns: 1fr;
         }
     }
-
 </style>
 
 <div class="full-form-wrapper">
@@ -115,7 +114,7 @@
             </div>
         @endif
 
-        <form action="{{ route('menus.update', $menu->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('menus.update', $menu->id) }}" method="POST" enctype="multipart/form-data" novalidate>
             @csrf
             @method('PUT')
 
@@ -141,12 +140,51 @@
                 </div>
             </div>
 
+            <div class="form-grid mb-4">
+                <div>
+                    <label for="category">Kategori Produk</label>
+                    <select name="category" id="category" class="form-control @error('category') is-invalid @enderror" required>
+                        <option value="" disabled {{ old('category') === null ? 'selected' : '' }}>-- Pilih Kategori --</option>
+                        <option value="manis" {{ old('category') == 'manis' ? 'selected' : '' }}>Roti Manis</option>
+                        <option value="tawar" {{ old('category') == 'tawar' ? 'selected' : '' }}>Roti Tawar</option>
+                        <option value="Kue (Cake)" {{ old('category') == 'Kue (Cake)' ? 'selected' : '' }}>Kue (Cake)</option>
+                        <option value="Donat" {{ old('category') == 'Donat' ? 'selected' : '' }}>Donat</option>
+                        <option value="Pastry" {{ old('category') == 'Pastry' ? 'selected' : '' }}>Pastry</option>
+                    </select>
+                    @error('category')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="stock">Stok Produk</label>
+                    <input type="number" name="stock" id="stock" min="0"
+                        class="form-control @error('stock') is-invalid @enderror"
+                        value="{{ old('stock', $menu->stock) }}" placeholder="Masukkan jumlah stok" required>
+                    @error('stock')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
             <div class="mb-4">
                 <label for="description">Deskripsi</label>
                 <textarea name="description" id="description" rows="5"
                     class="form-control @error('description') is-invalid @enderror"
                     required>{{ old('description', $menu->description) }}</textarea>
                 @error('description')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="available">Status Produk</label>
+                <select name="available" id="available" class="form-control @error('available') is-invalid @enderror" required>
+                    <option value="">-- Pilih Status --</option>
+                    <option value="1" {{ old('available', $menu->available) == '1' ? 'selected' : '' }}>Tersedia</option>
+                    <option value="0" {{ old('available', $menu->available) == '0' ? 'selected' : '' }}>Tidak Tersedia</option>
+                </select>
+                @error('available')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
@@ -169,4 +207,3 @@
         </form>
     </div>
 </div>
-

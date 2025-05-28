@@ -1,4 +1,3 @@
-
 <style>
     body {
         background-color: #ffffff;
@@ -32,12 +31,12 @@
     }
 
     .product-grid {
-    display: flex;
-    overflow-x: auto;
-    gap: 24px;
-    padding: 30px;
-    scroll-snap-type: x mandatory;
-}
+        display: flex;
+        overflow-x: auto;
+        gap: 24px;
+        padding: 30px;
+        scroll-snap-type: x mandatory;
+    }
 
     .card {
         background-color: #fff;
@@ -49,22 +48,23 @@
     }
 
     .card img {
-    width: 100%;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-    display: block;
-    flex: 0 0 auto;
-    width: 260px;
-    scroll-snap-align: start;
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        display: block;
+        flex: 0 0 auto;
+        width: 260px;
+        scroll-snap-align: start;
     }
 
     .product-grid::-webkit-scrollbar {
-    height: 10px;
-}
-.product-grid::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 10px;
-}
+        height: 10px;
+    }
+
+    .product-grid::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 10px;
+    }
 
     .card-body {
         padding: 16px;
@@ -83,8 +83,7 @@
     .card-text {
         font-size: 14px;
         color: #7f8c8d;
-        margin-bottom: 12px;
-        flex: 1;
+        margin-bottom: 8px;
     }
 
     .card-price {
@@ -125,7 +124,6 @@
         padding: 15px;
         border-radius: 8px;
     }
-
 </style>
 
 <div class="header-area">
@@ -152,7 +150,9 @@
         <div class="card-body">
             <div class="card-title">{{ $menu->name }}</div>
             <div class="card-text">{{ $menu->description }}</div>
-            <div class="card-price">Rp {{ number_format($menu->price,0,',','.') }}</div>
+            <div class="card-text"><strong>Kategori:</strong> {{ $menu->kategori }}</div>
+            <div class="card-text"><strong>Stok:</strong> {{ $menu->stok }} pcs</div>
+            <div class="card-price">Rp {{ number_format($menu->price, 0, ',', '.') }}</div>
 
             <div class="btn-group">
                 @if(auth()->user()->is_admin)
@@ -164,7 +164,6 @@
                         <button type="submit" class="btn-sm btn-danger">Hapus</button>
                     </form>
                 @else
-                    <!-- Contoh tombol untuk user biasa, misal tambah ke keranjang -->
                     <form action="{{ route('carts.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="menu_id" value="{{ $menu->id }}">

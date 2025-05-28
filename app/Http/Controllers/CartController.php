@@ -8,16 +8,19 @@ use Illuminate\Http\Request;
 class CartController extends Controller
 {
     /**
-     * Menampilkan daftar item di keranjang user.
+     * Tampilkan semua item dalam keranjang pengguna.
      */
     public function index()
     {
-        $carts = Cart::with('menu')->where('user_id', auth()->id())->get();
+        $carts = Cart::with('menu')
+            ->where('user_id', auth()->id())
+            ->get();
+
         return view('carts.index', compact('carts'));
     }
 
     /**
-     * Menambahkan item ke keranjang.
+     * Tambahkan item ke keranjang.
      */
     public function store(Request $request)
     {
@@ -26,34 +29,46 @@ class CartController extends Controller
             'quantity' => 'nullable|integer|min:1',
         ]);
 
-        $quantity = $request->quantity ?? 1;
+        $userId = auth()->id();
+        $menuId = $request->menu_id;
+        $quantity = $request->input('quantity', 1);
 
-        $cart = Cart::where('user_id', auth()->id())
-                    ->where('menu_id', $request->menu_id)
+        $cart = Cart::where('user_id', $userId)
+                    ->where('menu_id', $menuId)
                     ->first();
 
         if ($cart) {
-            // Tambah quantity jika sudah ada
+            // Jika sudah ada, tambahkan jumlah
             $cart->quantity += $quantity;
             $cart->save();
         } else {
-            // Buat item baru
+            // Jika belum ada, buat entri baru
             Cart::create([
-                'user_id' => auth()->id(),
-                'menu_id' => $request->menu_id,
+                'user_id' => $userId,
+                'menu_id' => $menuId,
                 'quantity' => $quantity,
             ]);
         }
 
-        return redirect()->route('carts.index')->with('success', 'Item berhasil ditambahkan ke keranjang!');
+        // Cek apakah request adalah AJAX/JSON
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Item berhasil ditambahkan ke keranjang!',
+            ], 200);
+        }
+
+        // Jika bukan JSON, redirect biasa
+        return redirect()->route('carts.index')
+            ->with('success', 'Item berhasil ditambahkan ke keranjang!');
     }
 
     /**
-     * Update quantity item di keranjang.
+     * Perbarui jumlah item dalam keranjang.
      */
     public function update(Request $request, Cart $cart)
     {
-        // Pastikan user hanya bisa update item miliknya
+        // Cek kepemilikan
         if ($cart->user_id !== auth()->id()) {
             abort(403, 'Akses ditolak.');
         }
@@ -62,9 +77,12 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $cart->update(['quantity' => $request->quantity]);
+        $cart->update([
+            'quantity' => $request->quantity
+        ]);
 
-        return redirect()->route('carts.index')->with('success', 'Keranjang berhasil diupdate!');
+        return redirect()->route('carts.index')
+            ->with('success', 'Jumlah item berhasil diperbarui!');
     }
 
     /**
@@ -72,13 +90,31 @@ class CartController extends Controller
      */
     public function destroy(Cart $cart)
     {
-        // Pastikan user hanya bisa hapus item miliknya
+        // Cek kepemilikan
         if ($cart->user_id !== auth()->id()) {
             abort(403, 'Akses ditolak.');
         }
 
         $cart->delete();
 
-        return redirect()->route('carts.index')->with('success', 'Item berhasil dihapus dari keranjang!');
+        return redirect()->route('carts.index')
+            ->with('success', 'Item berhasil dihapus dari keranjang!');
     }
+
+    public function updateQuantity(Request $request, $id)
+{
+    $request->validate([
+        'quantity' => 'required|integer|min:1',
+    ]);
+
+    $cart = Cart::findOrFail($id);
+    $cart->quantity = $request->quantity;
+    $cart->save();
+
+    return response()->json([
+        'success' => true,
+        'total' => $cart->menu->price * $cart->quantity
+    ]);
+}
+
 }
