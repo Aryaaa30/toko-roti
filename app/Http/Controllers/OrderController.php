@@ -227,4 +227,63 @@ public function updateAddress(Request $request, Order $order)
     return redirect()->back()->with('success', 'Alamat berhasil diperbarui.');
 }
 
+public function pay(Request $request, Order $order)
+{
+    if (!auth()->user()->is_admin && $order->user_id !== auth()->id()) {
+        abort(403, 'Akses ditolak.');
+    }
+
+    // Validasi: pastikan pesanan belum dibayar
+    if ($order->payment_status === 'paid') {
+        return redirect()->back()->with('info', 'Pesanan sudah dibayar.');
+    }
+
+    // Konfigurasi Midtrans
+    Config::$serverKey = config('midtrans.server_key');
+    Config::$isProduction = config('midtrans.is_production');
+    Config::$isSanitized = true;
+    Config::$is3ds = true;
+
+    // Persiapkan item details
+    $items = [];
+    foreach ($order->items as $item) {
+        $items[] = [
+            'id' => $item->id,
+            'price' => $item->price,
+            'quantity' => $item->quantity,
+            'name' => $item->menu->name,
+        ];
+    }
+
+    // Customer details
+    $customerDetails = [
+        'first_name' => auth()->user()->name,
+        'email' => auth()->user()->email,
+        'phone' => auth()->user()->phone ?? '08123456789',
+        'shipping_address' => [
+            'address' => $order->shipping_address ?? 'Alamat belum diisi',
+        ],
+    ];
+
+    // Parameter transaksi Midtrans
+    $params = [
+        'transaction_details' => [
+            'order_id' => $order->order_code,
+            'gross_amount' => $order->total_price,
+        ],
+        'item_details' => $items,
+        'customer_details' => $customerDetails,
+    ];
+
+    // Dapatkan Snap Token
+    $snapToken = Snap::getSnapToken($params);
+
+    // Simpan Snap Token ke DB (kalau mau)
+    $order->update(['snap_token' => $snapToken]);
+
+    // Redirect atau tampilkan view pembayaran (pakai Snap JS di front-end)
+    return view('orders.payment', compact('order', 'snapToken'));
+}
+
+
 }

@@ -33,10 +33,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::put('/carts/{id}/quantity', [CartController::class, 'updateQuantity'])->name('carts.updateQuantity');
-Route::put('/orders/{order}/address', [OrderController::class, 'updateAddress'])->name('orders.update_address');
 Route::post('/orders/{order}/pay', [OrderController::class, 'pay'])->name('orders.pay');
-Route::get('/orders/{id}/snap-token', [OrderController::class, 'getSnapToken'])->name('orders.getSnapToken');
+Route::get('/orders/{order}/getSnapToken', [OrderController::class, 'getSnapToken'])->name('orders.getSnapToken');
 Route::put('/orders/{order}/update-address', [OrderController::class, 'updateAddress'])->name('orders.update_address');
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
+
 
 // Route khusus admin
 Route::middleware(['auth', 'admin'])->group(function () {

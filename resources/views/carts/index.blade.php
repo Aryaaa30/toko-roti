@@ -1,164 +1,135 @@
-
 <style>
     body {
-        background-color: #ffffff;
+        background-color: #f5f5f5;
         font-family: 'Segoe UI', sans-serif;
     }
 
-    .header-area {
-        text-align: center;
-        padding: 40px 20px 20px;
-    }
-
-    .header-area h1 {
-        font-size: 32px;
-        font-weight: 700;
-        color: #2c3e50;
-    }
-
-    .product-grid {
+    .container {
         display: flex;
-        overflow-x: auto;
-        gap: 24px;
-        padding: 30px;
-        scroll-snap-type: x mandatory;
+        gap: 20px;
+        max-width: 1200px;
+        margin: 30px auto;
+    }
+
+    .left-column {
+        flex: 2;
+    }
+
+    .right-column {
+        flex: 1;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 30px;
     }
 
     .card {
         background-color: #fff;
-        border-radius: 16px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
         display: flex;
-        flex-direction: column;
-        width: 260px;
-        scroll-snap-align: start;
+        gap: 15px;
         position: relative;
-    }
-
-    .card input[type="checkbox"] {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        transform: scale(1.4);
+        padding: 10px;
     }
 
     .card img {
-        width: 100%;
-        aspect-ratio: 3 / 4;
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
         object-fit: cover;
-        display: block;
-    }
-
-    .product-grid::-webkit-scrollbar {
-        height: 10px;
-    }
-
-    .product-grid::-webkit-scrollbar-thumb {
-        background-color: rgba(0,0,0,0.2);
-        border-radius: 10px;
     }
 
     .card-body {
-        padding: 16px;
         flex: 1;
         display: flex;
         flex-direction: column;
     }
 
     .card-title {
+        font-size: 16px;
         font-weight: bold;
-        font-size: 18px;
-        margin-bottom: 8px;
         color: #2c3e50;
     }
 
     .card-text {
         font-size: 14px;
         color: #7f8c8d;
-        margin-bottom: 8px;
-        flex: 1;
     }
 
     .card-price {
         font-weight: bold;
-        font-size: 16px;
         color: #e67e22;
-        margin-bottom: 12px;
+        margin-top: 8px;
+    }
+
+    .quantity-form {
+        display: flex;
+        align-items: center;
+        margin-top: 8px;
     }
 
     .quantity-form input[type="number"] {
-        width: 60px;
-        padding: 6px 10px;
-        border-radius: 6px;
+        width: 50px;
+        padding: 4px;
         border: 1px solid #ccc;
-        margin-right: 8px;
-        font-size: 14px;
+        border-radius: 4px;
+        text-align: center;
     }
 
     .btn-sm {
-        font-size: 14px;
-        padding: 6px 12px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .btn-danger {
         background-color: #e74c3c;
         color: #fff;
-    }
-
-    .checkout-wrapper {
-        text-align: center;
-        margin: 30px auto;
-    }
-
-    .btn-checkout {
-        background-color: #27ae60;
-        color: white;
-        padding: 12px 30px;
         border: none;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 16px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        margin-top: 8px;
         cursor: pointer;
-        margin-left: 20px;
-    }
-
-    .btn-checkout:hover {
-        background-color: #219150;
-    }
-
-    .total-display {
-        font-size: 18px;
-        font-weight: bold;
-        color: #2c3e50;
-        display: inline-block;
     }
 
     .select-all-wrapper {
         display: flex;
         align-items: center;
-        justify-content: center;
         gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .total-display {
+        font-size: 16px;
+        font-weight: bold;
         margin-bottom: 10px;
     }
 
+    .btn-checkout {
+        width: 100%;
+        background-color: #27ae60;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
     .alert {
-        max-width: 700px;
-        margin: 20px auto;
         background-color: #d4edda;
         color: #155724;
-        padding: 15px;
-        border-radius: 8px;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
     }
 
     .empty-message {
         text-align: center;
-        margin-top: 40px;
-        font-size: 18px;
-        color: #7f8c8d;
+        padding: 50px 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .btn-primary {
@@ -166,14 +137,19 @@
         color: white;
         padding: 10px 20px;
         text-decoration: none;
-        border-radius: 8px;
-        font-weight: 600;
+        border-radius: 6px;
         display: inline-block;
         margin-top: 10px;
     }
 
     .btn-primary:hover {
         background-color: #d35400;
+    }
+
+    .card input[type="checkbox"] {
+        position: absolute;
+        top: 10px;
+        left: 10px;
     }
 </style>
 
@@ -186,24 +162,20 @@
 @endif
 
 @if($carts->count() > 0)
+<div class="container">
+    <div class="left-column">
+        <div class="select-all-wrapper">
+            <input type="checkbox" id="select-all"> <label for="select-all">Pilih Semua</label>
+        </div>
 
-    <div class="select-all-wrapper">
-        <input type="checkbox" id="select-all"> <label for="select-all">Pilih Semua</label>
-    </div>
-
-    <div class="product-grid">
         @foreach($carts as $cart)
         <div class="card" data-id="{{ $cart->id }}">
-            <input 
-                type="checkbox" 
-                class="product-checkbox"
-                data-total="{{ ($cart->menu->price ?? 0) * $cart->quantity }}"
-            >
+            <input type="checkbox" class="product-checkbox" data-total="{{ ($cart->menu->price ?? 0) * $cart->quantity }}">
 
             @if($cart->menu && $cart->menu->image)
                 <img src="{{ asset('storage/'.$cart->menu->image) }}" alt="{{ $cart->menu->name }}">
             @else
-                <img src="https://via.placeholder.com/300x180?text=No+Image" alt="No image">
+                <img src="https://via.placeholder.com/100" alt="No image">
             @endif
 
             <div class="card-body">
@@ -211,44 +183,34 @@
                 <div class="card-text"><strong>Kategori:</strong> {{ $cart->menu->kategori ?? '-' }}</div>
                 <div class="card-text">{{ $cart->menu->description ?? '-' }}</div>
                 <div class="card-text"><strong>Stok:</strong> {{ $cart->menu->stok ?? 0 }} pcs</div>
-                <div class="card-price">Harga: Rp {{ number_format($cart->menu->price ?? 0, 0, ',', '.') }}</div>
+                <div class="card-price">Rp {{ number_format($cart->menu->price ?? 0, 0, ',', '.') }}</div>
 
                 <div class="quantity-form">
-                    <input 
-                        type="number" 
-                        name="quantity" 
-                        value="{{ $cart->quantity }}" 
-                        min="1" 
-                        class="quantity-input"
-                        data-price="{{ $cart->menu->price ?? 0 }}"
-                        aria-label="Jumlah produk"
-                    >
+                    <input type="number" name="quantity" value="{{ $cart->quantity }}" min="1" class="quantity-input" data-price="{{ $cart->menu->price ?? 0 }}">
                 </div>
 
                 <div class="card-price">
-                    Total: Rp <span class="total-price">
-                        {{ number_format(($cart->menu->price ?? 0) * $cart->quantity, 0, ',', '.') }}
-                    </span>
+                    Total: Rp <span class="total-price">{{ number_format(($cart->menu->price ?? 0) * $cart->quantity, 0, ',', '.') }}</span>
                 </div>
 
                 <form action="{{ route('carts.destroy', $cart->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus item ini?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn-sm btn-danger" style="width: 100%;">Hapus</button>
+                    <button type="submit" class="btn-sm">Hapus</button>
                 </form>
             </div>
         </div>
         @endforeach
     </div>
 
-    <div class="checkout-wrapper">
-        <span class="total-display">Total: Rp <span id="total-amount">0</span></span>
-        <form action="{{ route('orders.store') }}" method="POST" style="display: inline;">
+    <div class="right-column">
+        <div class="total-display">Total: Rp <span id="total-amount">0</span></div>
+        <form action="{{ route('orders.store') }}" method="POST">
             @csrf
-            <button type="submit" class="btn-checkout">Checkout</button>
+            <button type="submit" class="btn-checkout">Beli</button>
         </form>
     </div>
-
+</div>
 @else
     <div class="empty-message">
         <p>Keranjang belanja kosong.</p>
@@ -304,4 +266,3 @@
         });
     });
 </script>
-
