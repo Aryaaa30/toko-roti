@@ -8,14 +8,27 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\UserController;
+use App\Models\Menu;
+
 
 Route::get('/', function () {
-    return view('welcome');
+    $menus = Menu::with('reviews')->get();
+    return view('home', compact('menus'));
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/home', function () {
+    $menus = Menu::with('reviews')->get();
+    return view('home', compact('menus'));
+});
+
+
+Route::get('/dashboard', [MenuController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');
+
 
 Route::middleware('auth')->group(function () {
     // Profil user
@@ -37,6 +50,33 @@ Route::post('/orders/{order}/pay', [OrderController::class, 'pay'])->name('order
 Route::get('/orders/{order}/getSnapToken', [OrderController::class, 'getSnapToken'])->name('orders.getSnapToken');
 Route::put('/orders/{order}/update-address', [OrderController::class, 'updateAddress'])->name('orders.update_address');
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
+
+Route::get('/bakeries', [MenuController::class, 'bakeries'])->name('bakeries');
+Route::get('/categories', [MenuController::class, 'categories'])->name('categories');
+Route::get('/birthday', [MenuController::class, 'birthday'])->name('birthday');
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+Route::get('/account', function () {
+    return view('profiles.account'); // Pastikan file ini ada di resources/views/account.blade.php
+})->middleware(['auth'])->name('account.page');
+
+Route::get('/account/settings', function () {
+    return view('profiles.settings');
+})->name('account.settings');
+
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/home');
+})->name('logout');
+
+Route::middleware('auth')->group(function() {
+    Route::post('/user/changePassword', [UserController::class, 'changePassword'])->name('user.changePassword');
+});
+
+Route::post('/account/update-profile', [UserController::class, 'updateProfile'])->name('user.updateProfile');
+Route::post('/account/upload-profile-picture', [UserController::class, 'uploadProfilePicture'])->name('account.uploadProfilePicture');
+
 
 
 // Route khusus admin

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->decimal('price', 10, 2);
-            $table->string('image')->nullable();
+            $table->string('images')->nullable();
             $table->integer('stok')->default(0); // Tambahkan stok
             $table->enum('kategori', [
                 'Roti Manis',

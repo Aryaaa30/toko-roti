@@ -10,44 +10,41 @@ class MenuController extends Controller
 {
     public function __construct()
     {
-        // Batasi akses method tertentu hanya untuk admin
         $this->middleware('admin')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
-    /**
-     * Tampilkan daftar menu.
-     * Admin lihat semua, user lihat yang tersedia saja.
-     */
-    public function index()
+   public function index(Request $request)
     {
-        if (auth()->user()->is_admin) {
-            $menus = Menu::all();
-            return view('menus.admin_index', compact('menus'));
+        $category = $request->query('kategori');
+
+        if ($category) {
+            $menus = Menu::where('kategori', $category)->get();
         } else {
-            $menus = Menu::all();
-            return view('menus.user_index', compact('menus'));
+            $menus = Menu::with('reviews')->get();
+        }
+
+        if (auth()->user()->is_admin) {
+            return view('menus.menu_admin', compact('menus'));
+        } else {
+            // Perbaiki bagian ini: selalu kirim $category ke view
+            return view('menus.menu_user', [
+                'menus' => $menus,
+                'category' => $category // walaupun null, dikirim tetap
+            ]);
         }
     }
 
-    /**
-     * Tampilkan detail menu (opsional).
-     */
-   public function show(Menu $menu)
-{
-    return view('menus.show', compact('menu'));
-}
 
-    /**
-     * Tampilkan form tambah menu (hanya admin).
-     */
+    public function show(Menu $menu)
+    {
+        return view('menus.detail', compact('menu'));
+    }
+
     public function create()
     {
         return view('menus.create');
     }
 
-    /**
-     * Simpan menu baru (hanya admin).
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -57,31 +54,32 @@ class MenuController extends Controller
             'available' => 'required|boolean',
             'stok' => 'required|integer|min:0',
             'kategori' => 'required|in:Roti Manis,Roti Tawar,Kue (Cake),Donat,Pastry',
-            'image' => 'nullable|image|max:2048',
+            'images.*' => 'nullable|image|max:2048', // validasi setiap gambar
         ]);
 
         $data = $request->only(['name', 'description', 'price', 'available', 'stok', 'kategori']);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('menus', 'public');
+        // Upload dan simpan banyak gambar
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('menus', 'public');
+                $imagePaths[] = $path;
+            }
         }
+
+        $data['images'] = json_encode($imagePaths); // simpan sebagai JSON
 
         Menu::create($data);
 
         return redirect()->route('menus.index')->with('success', 'Menu berhasil ditambahkan!');
     }
 
-    /**
-     * Tampilkan form edit menu (hanya admin).
-     */
     public function edit(Menu $menu)
     {
         return view('menus.edit', compact('menu'));
     }
 
-    /**
-     * Update menu (hanya admin).
-     */
     public function update(Request $request, Menu $menu)
     {
         $request->validate([
@@ -91,17 +89,28 @@ class MenuController extends Controller
             'available' => 'required|boolean',
             'stok' => 'required|integer|min:0',
             'kategori' => 'required|in:Roti Manis,Roti Tawar,Kue (Cake),Donat,Pastry',
-            'image' => 'nullable|image|max:2048',
+            'images.*' => 'nullable|image|max:2048',
         ]);
 
         $data = $request->only(['name', 'description', 'price', 'available', 'stok', 'kategori']);
 
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($menu->image && Storage::disk('public')->exists($menu->image)) {
-                Storage::disk('public')->delete($menu->image);
+        // Upload gambar baru dan hapus lama
+        if ($request->hasFile('images')) {
+            // Hapus gambar lama
+            if ($menu->images) {
+                foreach (json_decode($menu->images) as $oldImage) {
+                    if (Storage::disk('public')->exists($oldImage)) {
+                        Storage::disk('public')->delete($oldImage);
+                    }
+                }
             }
-            $data['image'] = $request->file('image')->store('menus', 'public');
+
+            $newImagePaths = [];
+            foreach ($request->file('images') as $image) {
+                $newImagePaths[] = $image->store('menus', 'public');
+            }
+
+            $data['images'] = json_encode($newImagePaths);
         }
 
         $menu->update($data);
@@ -109,18 +118,41 @@ class MenuController extends Controller
         return redirect()->route('menus.index')->with('success', 'Menu berhasil diupdate!');
     }
 
-    /**
-     * Hapus menu (hanya admin).
-     */
     public function destroy(Menu $menu)
     {
-        // Hapus gambar lama jika ada
-        if ($menu->image && Storage::disk('public')->exists($menu->image)) {
-            Storage::disk('public')->delete($menu->image);
+        if ($menu->images) {
+            foreach (json_decode($menu->images) as $imagePath) {
+                if (Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+            }
         }
 
         $menu->delete();
 
         return redirect()->route('menus.index')->with('success', 'Menu berhasil dihapus!');
     }
+
+    public function categories(Request $request)
+    {
+        // Tangkap kategori yang dikirim di URL
+        $kategori = $request->type;
+
+        // Query hanya menu dengan kategori tersebut
+        $menus = Menu::where('kategori', $kategori)->with('reviews')->get();
+
+        // Kirim data ke view
+        return view('menus.categories', compact('menus', 'kategori'));
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $menus = Menu::where('name', 'LIKE', "%{$query}%")
+                    ->orWhere('kategori', 'LIKE', "%{$query}%")
+                    ->get();
+
+        return view('your-view-name', compact('menus'));
+    }
+
 }

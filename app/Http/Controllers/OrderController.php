@@ -25,7 +25,7 @@ class OrderController extends Controller
             $orders = Order::where('user_id', auth()->id())->orderBy('created_at', 'desc')->get();
         }
 
-        return view('orders.index', compact('orders'));
+        return view('orders.order', compact('orders'));
     }
 
     /**
@@ -113,7 +113,7 @@ class OrderController extends Controller
 
         $order->load('items.menu', 'user');
 
-        return view('orders.show', compact('order'));
+        return view('orders.detail', compact('order'));
     }
 
     /**

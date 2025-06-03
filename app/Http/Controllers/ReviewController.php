@@ -22,7 +22,7 @@ class ReviewController extends Controller
             $reviews = Review::where('user_id', auth()->id())->with('menu')->orderBy('created_at', 'desc')->get();
         }
 
-        return view('reviews.index', compact('reviews'));
+        return view('reviews.review', compact('reviews'));
     }
 
     /**

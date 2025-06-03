@@ -17,4 +17,10 @@ class Menu extends Model
         'stok',
         'kategori'
     ];
+
+    public function reviews()
+{
+    return $this->hasMany(Review::class);
+}
+
 }

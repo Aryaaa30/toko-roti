@@ -15,7 +15,7 @@ class OrderItemController extends Controller
     public function index()
     {
         $orderItems = OrderItem::with(['order', 'menu'])->orderBy('created_at', 'desc')->get();
-        return view('orderitems.index', compact('orderItems'));
+        return view('orderitems.order_item', compact('orderItems'));
     }
 
     /**

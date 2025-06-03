@@ -16,7 +16,7 @@ class CartController extends Controller
             ->where('user_id', auth()->id())
             ->get();
 
-        return view('carts.index', compact('carts'));
+        return view('carts.cart', compact('carts'));
     }
 
     /**

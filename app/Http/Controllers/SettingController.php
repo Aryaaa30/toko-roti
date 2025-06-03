@@ -14,7 +14,7 @@ class SettingController extends Controller
     public function index()
     {
         $settings = Setting::orderBy('key')->get();
-        return view('settings.index', compact('settings'));
+        return view('settings.setting', compact('settings'));
     }
 
     /**

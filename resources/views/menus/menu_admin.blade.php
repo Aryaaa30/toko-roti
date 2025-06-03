@@ -1,3 +1,7 @@
+@extends('layouts.app')
+
+@section('content')
+
 <style>
     body {
         background-color: #ffffff;
@@ -125,10 +129,10 @@
         border-radius: 8px;
     }
 </style>
-
+@section('header')
+    <h1 class="text-center font-bold text-xl py-4">Daftar Produk Roti</h1>
+@endsection
 <div class="header-area">
-    <h1>Daftar Produk Roti</h1>
-
     @if(auth()->user()->is_admin)
         <a href="{{ route('menus.create') }}" class="btn-add">Tambah Produk</a>
     @endif
@@ -175,3 +179,4 @@
     </div>
     @endforeach
 </div>
+@endsection
