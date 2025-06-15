@@ -417,9 +417,9 @@ button.save-btn {
         <p>My Account</p>
         <h1>HI!</h1>
         <nav>
-          <a href="#">Dashboard</a>
+          <a href="{{ route('account.page')  }}">Dashboard</a>
           <a href="#">Order History</a>
-          <a href="#" class="active">Account Settings</a>
+          <a href="#">Account Settings</a>
         </nav>
       </div>
       <div class="sidebar-bottom">

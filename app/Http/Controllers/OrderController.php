@@ -20,13 +20,17 @@ class OrderController extends Controller
     public function index()
     {
         if (auth()->user()->is_admin) {
-            $orders = Order::with('user')->orderBy('created_at', 'desc')->get();
+            $orders = Order::with(['items.menu', 'user'])->latest()->get();
         } else {
-            $orders = Order::where('user_id', auth()->id())->orderBy('created_at', 'desc')->get();
+            $orders = Order::with(['items.menu', 'user'])
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->get();
         }
 
         return view('orders.order', compact('orders'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -167,47 +171,92 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Pesanan berhasil dihapus.');
     }
 
-    public function getSnapToken($id)
+public function getSnapToken($id)
 {
-    $order = Order::with('items.menu')->findOrFail($id);
+    try {
+        $order = Order::with('items.menu')->findOrFail($id);
 
+        // Cek jika pesanan sudah dibayar
+    if ($order->payment_status === 'paid') {
+            return response()->json([
+                'error' => 'Pesanan ini sudah dibayar'
+            ], 400);
+    }
+
+        // Setup konfigurasi Midtrans
     Config::$serverKey = config('midtrans.server_key');
     Config::$isProduction = config('midtrans.is_production');
     Config::$isSanitized = true;
     Config::$is3ds = true;
 
-    $items = [];
+        // Log untuk debugging
+        \Log::info('Midtrans config:', [
+            'server_key_exists' => !empty(config('midtrans.server_key')),
+            'is_production' => config('midtrans.is_production'),
+                'order_id' => $order->order_code,
+            'amount' => $order->total_price
+        ]);
 
-    foreach ($order->items as $item) {
-        $items[] = [
-            'id' => $item->id,
-            'price' => $item->price,
-            'quantity' => $item->quantity,
-            'name' => $item->menu->name,
-        ];
-    }
-
-    $params = [
-        'transaction_details' => [
-            'order_id' => $order->order_code,
-            'gross_amount' => $order->total_price,
-        ],
-        'item_details' => $items,
-        'customer_details' => [
-            'first_name' => 'Customer',
-            'email' => 'customer@example.com',
-            'phone' => '08123456789',
-            'shipping_address' => [
-                'address' => $order->shipping_address
-            ],
-        ],
+        // Persiapkan item details untuk Midtrans
+        $items = [];
+        foreach ($order->items as $item) {
+            $items[] = [
+                'id' => $item->id,
+                'price' => (int)$item->price,
+                'quantity' => (int)$item->quantity,
+                'name' => substr($item->menu->name, 0, 50), // Batasi nama produk (max 50 char)
     ];
+        }
 
+        $user = auth()->user();
+
+        // Pastikan gross_amount minimal Rp 10.000 untuk testing di sandbox
+        // Dan pastikan nilainya integer (bukan string atau float)
+        $grossAmount = max((int)$order->total_price, 10000);
+
+        // Parameter transaksi untuk Midtrans
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order->order_code,
+                'gross_amount' => $grossAmount,
+            ],
+            'item_details' => $items,
+            'customer_details' => [
+                'first_name' => $user->name ?? 'Customer',
+                'email' => $user->email ?? 'customer@example.com',
+                'phone' => $user->phone ?? '08123456789',
+                'shipping_address' => [
+                    'address' => $order->shipping_address ?? 'Alamat default'
+                ],
+            ],
+            'callbacks' => [
+                'finish' => config('midtrans.finish_redirect_url'),
+                'error' => config('midtrans.error_redirect_url'),
+                'unfinish' => config('midtrans.unfinish_redirect_url'),
+            ],
+        ];
+
+        // Log parameter yang dikirim ke Midtrans
+        \Log::info('Midtrans params:', $params);
+        // Dapatkan Snap Token dari Midtrans
     $snapToken = Snap::getSnapToken($params);
 
-    return response()->json([
-        'snap_token' => $snapToken
-    ]);
+        // Log snap token yang diterima
+        \Log::info('Midtrans snap token received:', ['token' => $snapToken]);
+        // Simpan snap token ke order
+    $order->update(['snap_token' => $snapToken]);
+
+        return response()->json([
+            'snap_token' => $snapToken
+        ]);
+    } catch (\Exception $e) {
+        // Log error untuk debugging
+        \Log::error('Midtrans getSnapToken error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+        return response()->json([
+            'error' => 'Gagal mengambil token pembayaran: ' . $e->getMessage()
+        ], 500);
+}
 }
 
 public function updateAddress(Request $request, Order $order)
@@ -284,6 +333,4 @@ public function pay(Request $request, Order $order)
     // Redirect atau tampilkan view pembayaran (pakai Snap JS di front-end)
     return view('orders.payment', compact('order', 'snapToken'));
 }
-
-
 }

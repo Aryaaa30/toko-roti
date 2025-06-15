@@ -1,573 +1,931 @@
 @extends('layouts.app')
 
 @section('content')
-<html lang="en">
- <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>
-   Product Page
-  </title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-  <style>
-   * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-    background-color: #2b2b2b;
-    font-family: 'Inter', sans-serif;
-    color: #222;
-  }
-  a {
-    text-decoration: none;
-    color: #009245;
-    font-weight: 500;
-    font-size: 14px;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
- .container {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-   padding-left: 130px;
-   margin: 40px auto 0;
+<style>
+body {
+  background: #000000;
 }
-  .breadcrumb {
-    display: flex;
-    flex-wrap: wrap;
-    font-size: 14px;
-    line-height: 1.3;
-    margin-bottom: 20px;
-  }
-  .breadcrumb a {
-    margin-right: 4px;
-  }
-  .breadcrumb span.separator {
-    margin-right: 4px;
-    color: #666;
-  }
-  .breadcrumb .last {
-    color: #222;
-    font-weight: 400;
-  }
-  .main-content {
-    display: flex;
-    gap: 30px;
-    flex-wrap: wrap;
-  }
-  .left-column {
-    flex: 1 1 320px;
-    max-width: 320px;
-  }
-  .main-image {
-    width: 320px;
-    height: 400px;
-    border-radius: 8px;
-    object-fit: cover;
-    display: block;
-  }
-  .tooltip {
-    position: absolute;
-    background: rgba(0,0,0,0.75);
-    color: #fff;
-    font-size: 12px;
-    padding: 3px 6px;
-    border-radius: 3px;
-    bottom: 10px;
-    left: 10px;
-    pointer-events: none;
-    user-select: none;
-  }
-  .thumbnail-row {
-    margin-top: 10px;
-    display: flex;
-    gap: 10px;
-  }
-  .thumbnail {
-    width: 56px;
-    height: 56px;
-    border-radius: 6px;
-    object-fit: cover;
-    cursor: pointer;
-    position: relative;
-  }
-  .thumbnail.play-button::after {
-    content: "\f04b";
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    position: absolute;
-    font-size: 20px;
-    color: #fff;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
-  .thumbnail-nav {
-    width: 24px;
-    height: 56px;
-    background: #666;
-    border-radius: 0 6px 6px 0;
-    color: #fff;
-    font-size: 18px;
-    line-height: 56px;
-    text-align: center;
-    cursor: pointer;
-    user-select: none;
-  }
-  .right-column {
-    flex: 1 1 600px;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-  }
-  .title {
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 1.2;
-    margin: 0 0 6px 0;
-    text-transform: uppercase;
-  }
-  .rating-row {
-    font-size: 14px;
-    color: #222;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .rating-row span {
-    color: #666;
-  }
-  .rating-row .star {
-    color: #f7c948;
-  }
-  .price {
-    font-weight: 700;
-    font-size: 28px;
-    margin-bottom: 20px;
-  }
-  hr {
-    border: none;
-    border-top: 1px solid #ddd;
-    margin: 0 0 20px 0;
-  }
-  .option-group {
-    margin-bottom: 20px;
-  }
-  .option-group strong {
-    font-weight: 700;
-    font-size: 14px;
-  }
-  .option-group .label-bold {
-    font-weight: 600;
-    color: #222;
-  }
-  .color-options, .size-options {
-    margin-top: 8px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .color-button, .size-button {
-    border-radius: 8px;
-    border: 1px solid #c4c9d9;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    background: #fff;
-    color: #666;
-    user-select: none;
-  }
-  .color-button img {
-    width: 20px;
-    height: 20px;
-    border-radius: 3px;
-    object-fit: cover;
-  }
-  .color-button.active, .size-button.active {
-    border-color: #009245;
-    color: #009245;
-    font-weight: 600;
-  }
-  .size-button {
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    font-weight: 600;
-  }
-  .size-button.active {
-    background: #e6f4ea;
-  }
-  .detail-tabs {
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    display: flex;
-    gap: 30px;
-    margin-bottom: 20px;
-  }
-  .tab {
-    font-weight: 600;
-    font-size: 14px;
-    padding: 12px 0;
-    cursor: pointer;
-    color: #666;
-    border-bottom: 3px solid transparent;
-  }
-  .tab.active {
-    color: #009245;
-    border-bottom-color: #009245;
-  }
-  .detail-content {
-    font-size: 14px;
-    line-height: 1.5;
-    color: #222;
-  }
-  .detail-content strong {
-    font-weight: 600;
-  }
-  .detail-content a {
-    color: #009245;
-    font-weight: 600;
-  }
- .sidebar {
-  width: 280px;
-  border: 1px solid #c4c9d9;
-  border-radius: 8px;
-  padding: 15px 20px 20px;
-  font-size: 14px;
-  line-height: 1.3;
-  color: #222;
+
+.container {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 32px 24px;
+}
+
+.main-content {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* Card Kiri - Foto dan Atribut Produk */
+.left-card {
+  flex: 1;
+
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.3);
+  display: flex;
+  gap: 32px;
+  
+}
+
+.image-section {
+  flex: 0 0 400px;
+  max-width: 400px;
+}
+
+.image-carousel {
+  width: 100%;
+  aspect-ratio: 1/1.15;
+  background: #000000;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #333;
+}
+
+.carousel-inner {
+  display: flex;
+  transition: transform 0.5s ease;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-item {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(254, 198, 228, 0.8);
+  color: #111;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  font-weight: bold;
+}
+
+.carousel-control:hover {
+  opacity: 1;
+  background: rgb(254, 198, 228);
+}
+
+.carousel-control-prev {
+  left: 10px;
+}
+
+.carousel-control-next {
+  right: 10px;
+}
+
+.image-carousel img, .main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #222;
+  border-radius: 14px;
+}
+
+.thumbnail-container {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: nowrap;
+  max-width: 100%;
+}
+
+.thumbnail {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid #333;
+  background: #222;
+  transition: border 0.2s, box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+.thumbnail.active, .thumbnail:hover {
+  border-color: rgb(254, 198, 228);
+  transform: scale(1.07);
+  box-shadow: 0 4px 12px rgba(254, 198, 228, 0.3);
+}
+
+.product-details {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 15px;
 }
-  .sidebar strong {
-    font-weight: 700;
-    font-size: 15px;
+
+.title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: rgb(245, 245, 245);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.price {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: rgb(254, 198, 228);
+  margin-bottom: 18px;
+}
+
+.badge-status {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  background: #222;
+  color: rgb(245, 245, 245);
+  letter-spacing: 0.5px;
+  border: 1px solid #444;
+}
+
+.badge-available {
+
+  color: rgb(254, 198, 228);
+  border: 1px solid rgb(254, 198, 228);
+}
+
+.badge-unavailable {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.product-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 16px;
+  background:rgb(0, 0, 0);
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  color: rgb(245, 245, 245);
+}
+
+.info-label {
+  font-weight: 600;
+  color: rgb(254, 198, 228);
+  min-width: 80px;
+}
+
+.info-value {
+  font-weight: 700;
+  color: rgb(245, 245, 245);
+}
+
+.rating-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.star-icon {
+  color: rgb(254, 198, 228);
+  font-size: 16px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #333;
+  margin: 24px 0;
+}
+
+.detail-tabs {
+  display: flex;
+  border-bottom: 1.5px solid #333;
+  margin-bottom: 18px;
+  gap: 0;
+}
+
+.tab {
+  padding: 10px 28px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #888;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s, border 0.2s;
+}
+
+.tab.active {
+  color: rgb(254, 198, 228);
+  border-bottom: 3px solid rgb(254, 198, 228);
+  background: none;
+}
+
+.detail-content {
+  font-size: 1.08rem;
+  color: rgb(245, 245, 245);
+  margin-top: 10px;
+  margin-bottom: 0;
+  line-height: 1.7;
+}
+
+.detail-content strong {
+  color: rgb(254, 198, 228);
+}
+
+/* Card Kanan - Atur Jumlah dan Catatan */
+.right-card {
+  flex: 0 0 340px;
+
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.3);
+  height: fit-content;
+  position: sticky;
+  top: 32px;
+  border: 1px solid #333;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: rgb(254, 198, 228);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.product-info {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 12px;
+  background:rgb(0, 0, 0);
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.product-info img {
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #222;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  border: 1px solid #333;
+}
+
+.product-name {
+  font-weight: 600;
+  font-size: 1.08rem;
+  color: rgb(245, 245, 245);
+}
+
+.quantity-section {
+  margin-bottom: 20px;
+}
+
+.quantity-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(254, 198, 228);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.quantity-stock {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #333;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 104px;
+  height: 40px;
+  background: #1a1a1a;
+}
+
+.quantity-control button {
+  border: none;
+  background: none;
+  font-size: 22px;
+  color: rgb(254, 198, 228);
+  font-weight: 700;
+  width: 34px;
+  height: 40px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.quantity-control button:hover {
+  background: rgba(254, 198, 228, 0.1);
+}
+
+.quantity-control button:disabled {
+  color: #555;
+  cursor: default;
+}
+
+.quantity-control input {
+  width: 36px;
+  height: 40px;
+  border: none;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: rgb(245, 245, 245);
+  outline: none;
+  background: none;
+  user-select: none;
+}
+
+.stock-text {
+  font-weight: 600;
+  font-size: 14px;
+  color: rgb(245, 245, 245);
+}
+
+.notes-section {
+  margin-bottom: 20px;
+}
+
+.notes-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(254, 198, 228);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.notes-input {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1.5px solid #333;
+  border-radius: 10px;
+  font-size: 14px;
+  color: rgb(245, 245, 245);
+  background:rgb(0, 0, 0);
+  resize: vertical;
+  font-family: inherit;
+}
+
+.notes-input:focus {
+  outline: none;
+  border-color: rgb(254, 198, 228);
+  box-shadow: 0 0 0 2px rgba(254, 198, 228, 0.2);
+}
+
+.notes-input::placeholder {
+  color: #888;
+}
+
+.subtotal-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.08rem;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #1a1a1a;
+  border-radius: 10px;
+  color: rgb(245, 245, 245);
+  border: 1px solid #333;
+}
+
+.subtotal-row strong {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: rgb(254, 198, 228);
+}
+
+.btn-primary {
+  background: rgb(254, 198, 228);
+  border: none;
+  border-radius: 10px;
+  color: #111;
+  font-weight: 700;
+  font-size: 1.08rem;
+  padding: 13px 0;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(254, 198, 228, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background: rgba(254, 198, 228, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(254, 198, 228, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1.5px solid rgb(254, 198, 228);
+  border-radius: 10px;
+  color: rgb(254, 198, 228);
+  font-weight: 700;
+  font-size: 1.08rem;
+  padding: 13px 0;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.alert-info {
+  background: rgba(0, 0, 0, 0.1);
+  color: rgb(254, 198, 228);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  margin-top: 8px;
+  border: 1px solid rgba(254, 198, 228, 0.3);
+}
+
+.alert-info a {
+  color: rgb(254, 198, 228);
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.cart-animation {
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  background: rgb(254, 198, 228);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111;
+  font-size: 20px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1000;
+  transition: none;
+}
+
+@media (max-width: 1200px) {
+  .container {
+    max-width: 100vw;
+    margin: 16px;
+    padding: 16px;
   }
-  .sidebar .product-info {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  .main-content {
+    gap: 16px;
   }
-  .sidebar .product-info img {
+  .right-card {
+    flex: 0 0 300px;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .left-card {
+    flex-direction: column;
+  }
+  .image-section {
+    flex: none;
+    max-width: 100%;
+  }
+  .right-card {
+    flex: none;
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    margin: 8px;
+    padding: 8px;
+  }
+  .left-card, .right-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  .image-carousel {
+    height: 250px;
+  }
+  .thumbnail {
     width: 50px;
     height: 50px;
-    border-radius: 6px;
-    object-fit: cover;
   }
-  .sidebar .product-name {
-    font-weight: 500;
-    font-size: 14px;
-    color: #222;
-  }
-  .quantity-stock {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 5px;
-  }
-  .quantity-control {
-    display: flex;
-    align-items: center;
-    border: 1px solid #c4c9d9;
-    border-radius: 8px;
-    overflow: hidden;
-    width: 90px;
-    height: 36px;
-  }
-  .quantity-control button {
-    border: none;
-    background: none;
-    font-size: 20px;
-    color: #009245;
-    font-weight: 700;
-    width: 28px;
-    height: 36px;
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .quantity-control button:disabled {
-    color: #ccc;
-    cursor: default;
-  }
-  .quantity-control input {
-    width: 34px;
-    height: 36px;
-    border: none;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 600;
-    color: #222;
-    outline: none;
-    user-select: none;
-  }
-  .stock-text {
-    font-weight: 700;
-    font-size: 14px;
-  }
-  .subtotal-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    margin-top: 10px;
-    margin-bottom: 15px;
-  }
-  .subtotal-row strong {
-    font-weight: 700;
-    font-size: 16px;
-  }
-  .btn-primary {
-    background-color: #009245;
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    font-weight: 700;
-    font-size: 16px;
-    padding: 12px 0;
-    cursor: pointer;
-    width: 100%;
-    margin-bottom: 10px;
-  }
-  .btn-primary:hover {
-    background-color: #007a33;
-  }
-  .btn-secondary {
-    background: none;
-    border: 1px solid #009245;
-    border-radius: 8px;
-    color: #009245;
-    font-weight: 700;
-    font-size: 16px;
-    padding: 12px 0;
-    cursor: pointer;
-    width: 100%;
-    margin-bottom: 10px;
-  }
-  .btn-secondary:hover {
-    background-color: #e6f4ea;
-  }
-  .sidebar-footer {
-    display: flex;
-    justify-content: space-between;
-    font-weight: 700;
-    font-size: 14px;
-    color: #222;
-  }
-  .sidebar-footer > div {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .sidebar-footer > div:not(:last-child) {
-    border-right: 1px solid #ddd;
-    padding-right: 10px;
-  }
-  .sidebar-footer i {
-    font-size: 16px;
-  }
-  @media (max-width: 1024px) {
-    .main-content {
-      flex-wrap: wrap;
-    }
-    .left-column, .right-column {
-      max-width: 100%;
-      flex: 1 1 100%;
-    }
-    .sidebar {
-      width: 100%;
-      margin-top: 30px;
-    }
-  }
-  @media (max-width: 480px) {
-    .breadcrumb {
-      font-size: 12px;
-    }
-    .title {
-      font-size: 16px;
-    }
-    .price {
-      font-size: 22px;
-    }
-    .color-button, .size-button {
-      font-size: 12px;
-      padding: 5px 10px;
-    }
-    .size-button {
-      width: 36px;
-      height: 36px;
-    }
-    .btn-primary, .btn-secondary {
-      font-size: 14px;
-      padding: 10px 0;
-    }
-    .sidebar {
-      padding: 15px 15px 20px;
-      font-size: 13px;
-    }
-    .sidebar-footer {
-      font-size: 13px;
-    }
-  }
-  </style>
- </head>
- <body>
+}
+</style>
 
-  <div class="container" role="main">
+<div class="container" role="main">
   <div class="main-content">
-    <!-- Kiri: Gambar Produk -->
-    <section aria-label="Product images" class="left-column">
-      <div style="position:relative; display:inline-block; margin-bottom: 16px;">
-        <img 
-          alt="{{ $menu->name }}" 
-          class="main-image" 
-          height="400" 
-          src="{{ $menu->image ? asset('storage/' . $menu->image) : 'https://via.placeholder.com/320x400?text=No+Image' }}" 
-          width="320"
-        />
-        <div aria-hidden="true" class="tooltip">
-          {{ strtoupper($menu->name) }}
+    <!-- Card Kiri: Foto dan Atribut Produk -->
+    <div class="left-card">
+      <!-- Bagian Gambar -->
+      <section aria-label="Product images" class="image-section">
+        <div class="image-carousel" id="product-carousel">
+          @if($menu->images)
+            <div class="carousel-inner">
+              @php
+                $images = json_decode($menu->images);
+                $displayImages = is_array($images) ? array_slice($images, 0, 3) : [];
+              @endphp
+              @if(is_array($displayImages) && count($displayImages) > 0)
+                @foreach($displayImages as $index => $imagePath)
+                  <div class="carousel-item" data-index="{{ $index }}">
+                    <img src="{{ asset('storage/'.$imagePath) }}" alt="{{ $menu->name }} image {{ $index + 1 }}">
+                  </div>
+                @endforeach
+              @else
+                <div class="carousel-item">
+                  <img src="https://via.placeholder.com/400x400?text=No+Image" alt="No image">
+                </div>
+              @endif
+            </div>
+            @if(is_array($displayImages) && count($displayImages) > 1)
+              <button class="carousel-control carousel-control-prev" onclick="prevSlide()">&#10094;</button>
+              <button class="carousel-control carousel-control-next" onclick="nextSlide()">&#10095;</button>
+            @endif
+          @elseif($menu->image)
+            <img class="main-image" src="{{ asset('storage/'.$menu->image) }}" alt="{{ $menu->name }}">
+          @else
+            <img class="main-image" src="https://via.placeholder.com/400x400?text=No+Image" alt="No image">
+          @endif
         </div>
-      </div>
-    </section>
+        
+        <!-- Thumbnail Gallery -->
+        @if($menu->images)
+          @php
+            $images = json_decode($menu->images);
+            $displayImages = is_array($images) ? array_slice($images, 0, 3) : [];
+          @endphp
+          @if(is_array($displayImages) && count($displayImages) > 1)
+            <div class="thumbnail-container" id="thumbnail-gallery">
+              @foreach($displayImages as $index => $imagePath)
+                <img 
+                  src="{{ asset('storage/'.$imagePath) }}" 
+                  alt="Thumbnail {{ $index + 1 }}" 
+                  class="thumbnail {{ $index === 0 ? 'active' : '' }}" 
+                  data-index="{{ $index }}"
+                  onclick="showSlide({{ $index }})"
+                >
+              @endforeach
+            </div>
+          @endif
+        @endif
+      </section>
 
-    <!-- Tengah: Detail Produk -->
-    <section aria-label="Product details" class="right-column" style="padding: 20px;">
-      <h1 class="title" style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">
-        {{ $menu->name }}
-      </h1>
+      <!-- Bagian Detail Produk -->
+      <section aria-label="Product details" class="product-details">
+        <h1 class="title">{{ $menu->name }}</h1>
 
-      <div class="rating-row" style="font-size: 14px; margin-bottom: 8px; color: #333;">
-        <span>Terjual <span style="color:#999;">{{ $menu->stok }}+</span></span>
-        <span style="margin: 0 5px;">•</span>
-        <span style="color: #f39c12;">★</span>
-        <span>{{ number_format($menu->reviews->avg('rating'), 1) ?? '0.0' }}</span>
-        <span style="color:#666;">({{ $menu->reviews->count() }} rating)</span>
-      </div>
+        <div class="price">Rp{{ number_format($menu->price, 0, ',', '.') }}</div>
 
-      <div class="price" style="font-size: 20px; font-weight: bold; color: #e74c3c;">
-        Rp{{ number_format($menu->price, 0, ',', '.') }}
-      </div>
-
-      <hr/>
-
-      <div class="option-group">
         <div>
-          <strong>Pilih warna:</strong>
-          <span class="label-bold">B.TERY NAVY</span>
+          @if(isset($menu->available))
+            <span class="badge-status {{ $menu->available ? 'badge-available' : 'badge-unavailable' }}">
+              {{ $menu->available ? 'Tersedia' : 'Tidak Tersedia' }}
+            </span>
+          @endif
         </div>
-        <div class="color-options" role="list">
-          <!-- Warna-warna -->
-          @foreach (['NAVY', 'BLACK', 'HIJAU', 'MAROON', 'ABU MISTY'] as $color)
-            <button 
-              class="color-button{{ $loop->first ? ' active' : '' }}" 
-              role="radio" 
-              type="button"
-              aria-checked="{{ $loop->first ? 'true' : 'false' }}"
-              aria-pressed="{{ $loop->first ? 'true' : 'false' }}"
-              aria-label="B.TERY {{ $color }}"
-            >
-              <img 
-                alt="Color swatch {{ strtolower($color) }}" 
-                height="20" 
-                src="https://storage.googleapis.com/a1aa/image/{{ strtolower($color) }}.jpg" 
-                width="20"
-              />
-              B.TERY {{ $color }}
-            </button>
-          @endforeach
+
+        <!-- Info Grid Vertikal -->
+        <div class="product-info-grid">
+          <div class="info-item">
+            <span class="info-label">Kategori:</span>
+            <span class="info-value">{{ $menu->kategori }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Stok:</span>
+            <span class="info-value">{{ $menu->stok }}</span>
+          </div>
+          <div class="info-item rating-item">
+            <span class="info-label">Rating:</span>
+            <span class="star-icon">★</span>
+            <span class="info-value">{{ $menu->reviews->count() > 0 ? number_format($menu->reviews->avg('rating'), 1) : '0.0' }}</span>
+            <span style="color: #888;">({{ $menu->reviews->count() }} rating)</span>
+          </div>
         </div>
-      </div>
 
-      <hr/>
+        <hr/>
 
-      <nav class="detail-tabs" role="tablist">
-        <button 
-          class="tab active" 
-          id="tab-detail" 
-          role="tab" 
-          aria-controls="tabpanel-detail" 
-          aria-selected="true"
+        <nav class="detail-tabs" role="tablist">
+          <button 
+            class="tab active" 
+            id="tab-detail" 
+            role="tab" 
+            aria-controls="tabpanel-detail" 
+            aria-selected="true"
+            tabindex="0"
+          >
+            Detail
+          </button>
+        </nav>
+
+        <section 
+          class="detail-content" 
+          id="tabpanel-detail" 
+          role="tabpanel" 
+          aria-labelledby="tab-detail"
           tabindex="0"
         >
-          Detail
-        </button>
-      </nav>
-
-      <section 
-        class="detail-content" 
-        id="tabpanel-detail" 
-        role="tabpanel" 
-        aria-labelledby="tab-detail"
-        tabindex="0"
-      >
-        <p><strong>Kondisi:</strong> Baru</p>
-        <p><strong>Min. Pemesanan:</strong> 1 Buah</p>
-        <p>Etalase: <a href="#">Fashion Pria Dan Wanita Dewasa</a></p>
-        <p>===========Detail Produk===========</p>
+          <p><strong>Deskripsi:</strong></p>
+          <p>{{ $menu->description }}</p>
+        </section>
       </section>
-    </section>
-  </div>
-
-  <!-- Kanan: Sidebar -->
-  <aside class="sidebar" aria-label="Order summary and actions">
-    <strong>Atur jumlah dan catatan</strong>
-
-    <div class="product-info">
-      <img 
-        alt="Thumbnail of {{ $menu->name }}" 
-        height="50" 
-        src="{{ $menu->image ? asset('storage/'.$menu->image) : 'https://via.placeholder.com/50?text=No+Image' }}" 
-        width="50"
-      />
-      <span class="product-name">{{ $menu->name }}, {{ $menu->size ?? 'Ukuran Standar' }}</span>
     </div>
 
-    <div class="quantity-stock">
-      <div 
-        class="quantity-control" 
-        role="spinbutton" 
-        aria-valuemin="1" 
-        aria-valuemax="{{ $menu->stok }}" 
-        aria-valuenow="1"
-      >
-        <button aria-label="Decrease quantity" disabled type="button">-</button>
-        <input readonly type="text" value="1" />
-        <button aria-label="Increase quantity" type="button">+</button>
+    <!-- Card Kanan: Atur Jumlah dan Catatan -->
+    <div class="right-card">
+      <h2 class="card-title">Atur Jumlah dan Catatan</h2>
+
+      <div class="product-info">
+        @if($menu->images)
+          @php
+            $images = json_decode($menu->images);
+            $firstImage = is_array($images) && count($images) > 0 ? $images[0] : null;
+          @endphp
+          <img 
+            alt="Thumbnail of {{ $menu->name }}" 
+            height="50" 
+            src="{{ $firstImage ? asset('storage/'.$firstImage) : 'https://via.placeholder.com/50?text=No+Image' }}" 
+            width="50"
+          />
+        @elseif($menu->image)
+          <img 
+            alt="Thumbnail of {{ $menu->name }}" 
+            height="50" 
+            src="{{ asset('storage/'.$menu->image) }}" 
+            width="50"
+          />
+        @else
+          <img 
+            alt="No image" 
+            height="50" 
+            src="https://via.placeholder.com/50?text=No+Image" 
+            width="50"
+          />
+        @endif
+        <span class="product-name">{{ $menu->name }}</span>
       </div>
-      <span class="stock-text">Stok: <strong>{{ $menu->stok }}</strong></span>
-    </div>
 
-    <div class="subtotal-row">
-      <span>Subtotal</span>
-      <strong>Rp{{ number_format($menu->price, 0, ',', '.') }}</strong>
-    </div>
+      <div class="quantity-section">
+        <label class="quantity-label">Jumlah</label>
+        <div class="quantity-stock">
+          <div class="quantity-control">
+            <button id="decrease-qty" type="button" onclick="updateQuantity(-1)">-</button>
+            <input id="quantity" readonly type="text" value="1" />
+            <button id="increase-qty" type="button" onclick="updateQuantity(1)">+</button>
+          </div>
+          <span class="stock-text">Stok: <strong>{{ $menu->stok }}</strong></span>
+        </div>
+      </div>
 
-    <button class="btn-primary" type="button">+ Keranjang</button>
-    <button class="btn-secondary" type="button">Beli Langsung</button>
+      <div class="notes-section">
+        <label class="notes-label" for="order-notes">Catatan Pesanan</label>
+        <textarea 
+          id="order-notes" 
+          class="notes-input" 
+          placeholder="Tambahkan catatan untuk pesanan Anda (opsional)..."
+        ></textarea>
+      </div>
 
-    <div class="sidebar-footer" role="group" aria-label="Chat, Wishlist and Share actions">
-      <div role="button" tabindex="0" aria-pressed="false"><i class="far fa-comment"></i> Chat</div>
-      <div role="button" tabindex="0" aria-pressed="false"><i class="far fa-heart"></i> Wishlist</div>
-      <div role="button" tabindex="0" aria-pressed="false"><i class="fas fa-share-alt"></i> Share</div>
+      <div class="subtotal-row">
+        <span>Subtotal</span>
+        <strong id="subtotal">Rp{{ number_format($menu->price, 0, ',', '.') }}</strong>
+      </div>
+
+      <form id="add-to-cart-form" action="{{ route('carts.store') }}" method="POST">
+        @csrf
+        <input type="hidden" name="menu_id" value="{{ $menu->id }}">
+        <input type="hidden" name="quantity" id="cart-quantity" value="1">
+        <input type="hidden" name="notes" id="cart-notes" value="">
+        <button id="add-to-cart-btn" class="btn-primary" type="button" onclick="addToCart()">+ Keranjang</button>
+      </form>
+      <button class="btn-secondary" type="button" onclick="buyNow()">Beli Langsung</button>
+      
+      @if(!$isLoggedIn)
+      <div class="alert-info">
+        <i class="fas fa-info-circle"></i> Anda perlu <a href="{{ route('login') }}">login</a> untuk menambahkan produk ke keranjang atau melakukan pembelian.
+      </div>
+      @endif
     </div>
-  </aside>
+  </div>
+  
+  <!-- Cart Animation Element -->
+  <div id="cart-animation" class="cart-animation">
+    <i class="fas fa-shopping-cart"></i>
+  </div>
 </div>
 
-</html>
+<script>
+  // Carousel functionality
+  let currentIndex = 0;
+  const carousel = document.getElementById('product-carousel');
+  const inner = carousel ? carousel.querySelector('.carousel-inner') : null;
+  const items = inner ? inner.querySelectorAll('.carousel-item') : [];
+  const totalItems = items.length;
+  const thumbnails = document.querySelectorAll('.thumbnail');
+  
+  function updateCartCount(count) {
+    const navElement = document.querySelector('nav');
+    if (navElement && window.Alpine) {
+      Alpine.evaluate(navElement, `cartCount = ${count}`);
+    }
+  }
+          
+  function showSlide(index) {
+    if (!inner || totalItems === 0) return;
+    
+    if (index >= totalItems) {
+      currentIndex = 0;
+    } else if (index < 0) {
+      currentIndex = totalItems - 1;
+    } else {
+      currentIndex = index;
+    }
+
+    inner.style.transform = `translateX(-${currentIndex * 100}%)`;
+    
+    thumbnails.forEach((thumb, i) => {
+      if (i === currentIndex) {
+        thumb.classList.add('active');
+      } else {
+        thumb.classList.remove('active');
+      }
+    });
+  }
+  
+  function nextSlide() {
+    showSlide(currentIndex + 1);
+  }
+  
+  function prevSlide() {
+    showSlide(currentIndex - 1);
+  }
+  
+  if (totalItems > 1) {
+    setInterval(nextSlide, 5000);
+  }
+  
+  // Quantity control
+  const quantityInput = document.getElementById('quantity');
+  const cartQuantityInput = document.getElementById('cart-quantity');
+  const cartNotesInput = document.getElementById('cart-notes');
+  const notesTextarea = document.getElementById('order-notes');
+  const decreaseBtn = document.getElementById('decrease-qty');
+  const increaseBtn = document.getElementById('increase-qty');
+  const subtotalElement = document.getElementById('subtotal');
+  const maxStock = {{ $menu->stok }};
+  const price = {{ $menu->price }};
+  
+  function updateQuantity(change) {
+    let currentQty = parseInt(quantityInput.value);
+    let newQty = currentQty + change;
+    
+    if (newQty < 1) newQty = 1;
+    if (newQty > maxStock) newQty = maxStock;
+    
+    quantityInput.value = newQty;
+    cartQuantityInput.value = newQty;
+    
+    const subtotal = price * newQty;
+    subtotalElement.textContent = 'Rp' + new Intl.NumberFormat('id-ID').format(subtotal);
+    
+    decreaseBtn.disabled = newQty <= 1;
+    increaseBtn.disabled = newQty >= maxStock;
+  }
+  
+  // Update notes when textarea changes
+  notesTextarea.addEventListener('input', function() {
+    cartNotesInput.value = this.value;
+  });
+  
+  decreaseBtn.disabled = true;
+  increaseBtn.disabled = maxStock <= 1;
+  
+  function addToCart() {
+    const isLoggedIn = {{ $isLoggedIn ? 'true' : 'false' }};
+    
+    if (!isLoggedIn) {
+      window.location.href = "{{ route('login') }}?redirect=" + encodeURIComponent(window.location.href);
+      return;
+    }
+    
+    const button = document.getElementById('add-to-cart-btn');
+    const animation = document.getElementById('cart-animation');
+    const form = document.getElementById('add-to-cart-form');
+    
+    const buttonRect = button.getBoundingClientRect();
+    const buttonX = buttonRect.left + buttonRect.width / 2;
+    const buttonY = buttonRect.top + buttonRect.height / 2;
+    
+    const cartIconX = window.innerWidth - 20;
+    const cartIconY = 20;
+    
+    animation.style.left = `${buttonX - 25}px`;
+    animation.style.top = `${buttonY - 25}px`;
+    animation.style.opacity = '1';
+
+    const formData = new FormData(form);
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        if (data.cartCount !== undefined) {
+          updateCartCount(data.cartCount);
+        } else {
+          fetch("{{ route('cart.count') }}")
+            .then(response => response.json())
+            .then(countData => {
+              updateCartCount(countData.cartCount);
+            });
+        }
+
+        setTimeout(() => {
+          animation.style.transition = 'all 0.8s cubic-bezier(0.2, 1, 0.3, 1)';
+          animation.style.left = `${cartIconX - 25}px`;
+          animation.style.top = `${cartIconY - 25}px`;
+          animation.style.transform = 'scale(0.5)';
+        }, 10);
+
+        setTimeout(() => {
+          animation.style.opacity = '0';
+          animation.style.transform = 'scale(0.2)';
+          alert('Produk berhasil ditambahkan ke keranjang!');
+        }, 800);
+      } else {
+        alert(data.message || 'Gagal menambahkan produk ke keranjang.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Terjadi kesalahan saat menambahkan produk ke keranjang.');
+    });
+  }
+  
+  function buyNow() {
+    const isLoggedIn = {{ $isLoggedIn ? 'true' : 'false' }};
+    
+    if (!isLoggedIn) {
+      window.location.href = "{{ route('login') }}?redirect=" + encodeURIComponent(window.location.href);
+      return;
+    }
+    
+    const form = document.getElementById('add-to-cart-form');
+    form.action = "{{ route('carts.store') }}?redirect=checkout";
+    form.submit();
+  }
+</script>
+
 @endsection

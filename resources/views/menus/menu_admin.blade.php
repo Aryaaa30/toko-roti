@@ -36,10 +36,10 @@
 
     .product-grid {
         display: flex;
-        overflow-x: auto;
+        flex-wrap: wrap;
         gap: 24px;
         padding: 30px;
-        scroll-snap-type: x mandatory;
+        justify-content: center;
     }
 
     .card {
@@ -49,25 +49,70 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        width: 260px;
+    }
+
+    .card-img-container {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
     }
 
     .card img {
         width: 100%;
-        aspect-ratio: 3 / 4;
+        height: 100%;
         object-fit: cover;
         display: block;
-        flex: 0 0 auto;
-        width: 260px;
-        scroll-snap-align: start;
     }
 
-    .product-grid::-webkit-scrollbar {
-        height: 10px;
+    /* Carousel styles */
+    .image-carousel {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
     }
 
-    .product-grid::-webkit-scrollbar-thumb {
-        background-color: rgba(0,0,0,0.2);
-        border-radius: 10px;
+    .carousel-inner {
+        display: flex;
+        transition: transform 0.5s ease;
+        height: 100%;
+    }
+
+    .carousel-item {
+        min-width: 100%;
+        height: 100%;
+    }
+
+    .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .carousel-control {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0,0,0,0.5);
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 2;
+        font-weight: bold;
+    }
+
+    .carousel-control-prev {
+        left: 10px;
+    }
+
+    .carousel-control-next {
+        right: 10px;
     }
 
     .card-body {
@@ -128,6 +173,25 @@
         padding: 15px;
         border-radius: 8px;
     }
+
+    .badge-status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .badge-available {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .badge-unavailable {
+        background-color: #e74c3c;
+        color: white;
+    }
 </style>
 @section('header')
     <h1 class="text-center font-bold text-xl py-4">Daftar Produk Roti</h1>
@@ -145,15 +209,39 @@
 <div class="product-grid">
     @foreach($menus as $menu)
     <div class="card">
-        @if($menu->image)
-            <img src="{{ asset('storage/'.$menu->image) }}" alt="{{ $menu->name }}">
-        @else
-            <img src="https://via.placeholder.com/300x180?text=No+Image" alt="No image">
-        @endif
+        <div class="image-carousel" id="carousel-{{ $menu->id }}">
+            @if($menu->images)
+                <div class="carousel-inner">
+                    @php
+                        $images = json_decode($menu->images);
+                    @endphp
+                    @foreach($images as $index => $imagePath)
+                        <div class="carousel-item" data-index="{{ $index }}">
+                            <img src="{{ asset('storage/'.$imagePath) }}" alt="{{ $menu->name }} image {{ $index + 1 }}">
+                        </div>
+    @endforeach
+</div>
+                @if(count($images) > 1)
+                    <button class="carousel-control carousel-control-prev" onclick="prevSlide('carousel-{{ $menu->id }}')">&#10094;</button>
+                    <button class="carousel-control carousel-control-next" onclick="nextSlide('carousel-{{ $menu->id }}')">&#10095;</button>
+                @endif
+            @elseif($menu->image)
+                <img src="{{ asset('storage/'.$menu->image) }}" alt="{{ $menu->name }}">
+            @else
+                <img src="https://via.placeholder.com/300x220?text=No+Image" alt="No image">
+            @endif
+        </div>
 
         <div class="card-body">
             <div class="card-title">{{ $menu->name }}</div>
-            <div class="card-text">{{ $menu->description }}</div>
+            <div>
+                @if(isset($menu->available))
+                    <span class="badge-status {{ $menu->available ? 'badge-available' : 'badge-unavailable' }}">
+                        {{ $menu->available ? 'Tersedia' : 'Tidak Tersedia' }}
+                    </span>
+                @endif
+            </div>
+            <div class="card-text">{{ Str::limit($menu->description, 100) }}</div>
             <div class="card-text"><strong>Kategori:</strong> {{ $menu->kategori }}</div>
             <div class="card-text"><strong>Stok:</strong> {{ $menu->stok }} pcs</div>
             <div class="card-price">Rp {{ number_format($menu->price, 0, ',', '.') }}</div>
@@ -179,4 +267,45 @@
     </div>
     @endforeach
 </div>
+
+<script>
+    // Carousel functionality for multiple images
+    function initCarousels() {
+        // Initialize all carousels with their first slide
+        const carousels = document.querySelectorAll('.image-carousel');
+        carousels.forEach(carousel => {
+            const id = carousel.id;
+            window[id] = { currentIndex: 0 };
+        });
+    }
+
+    function showSlide(carouselId, index) {
+        const carousel = document.getElementById(carouselId);
+        const inner = carousel.querySelector('.carousel-inner');
+        const items = inner.querySelectorAll('.carousel-item');
+
+        if (!items.length) return;
+
+        if (index >= items.length) {
+            window[carouselId].currentIndex = 0;
+        } else if (index < 0) {
+            window[carouselId].currentIndex = items.length - 1;
+        } else {
+            window[carouselId].currentIndex = index;
+        }
+
+        inner.style.transform = `translateX(-${window[carouselId].currentIndex * 100}%)`;
+    }
+
+    function nextSlide(carouselId) {
+        showSlide(carouselId, window[carouselId].currentIndex + 1);
+    }
+
+    function prevSlide(carouselId) {
+        showSlide(carouselId, window[carouselId].currentIndex - 1);
+    }
+
+    // Initialize all carousels when the page loads
+    document.addEventListener('DOMContentLoaded', initCarousels);
+</script>
 @endsection

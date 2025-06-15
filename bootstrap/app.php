@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Gunakan alias() untuk mendaftarkan middleware di Laravel 11/12
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'cart.auth' => \App\Http\Middleware\CartAuthMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

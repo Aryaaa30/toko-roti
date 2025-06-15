@@ -11,6 +11,7 @@ class MenuController extends Controller
     public function __construct()
     {
         $this->middleware('admin')->only(['create', 'store', 'edit', 'update', 'destroy']);
+        // Tidak perlu middleware auth untuk index dan show
     }
 
    public function index(Request $request)
@@ -23,7 +24,7 @@ class MenuController extends Controller
             $menus = Menu::with('reviews')->get();
         }
 
-        if (auth()->user()->is_admin) {
+        if (auth()->check() && auth()->user()->is_admin) {
             return view('menus.menu_admin', compact('menus'));
         } else {
             // Perbaiki bagian ini: selalu kirim $category ke view
@@ -34,10 +35,32 @@ class MenuController extends Controller
         }
     }
 
+    public function bakeries(Request $request)
+    {
+        $category = $request->query('kategori');
+
+        if ($category) {
+            $menus = Menu::where('kategori', $category)->get();
+        } else {
+            $menus = Menu::with('reviews')->get();
+        }
+
+        if (auth()->check() && auth()->user()->is_admin) {
+            return view('menus.menu_admin', compact('menus'));
+        } else {
+            return view('menus.menu_user', [
+                'menus' => $menus,
+                'category' => $category
+            ]);
+        }
+    }
 
     public function show(Menu $menu)
     {
-        return view('menus.detail', compact('menu'));
+        return view('menus.detail', [
+            'menu' => $menu,
+            'isLoggedIn' => auth()->check()
+        ]);
     }
 
     public function create()
@@ -63,7 +86,9 @@ class MenuController extends Controller
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $path = $image->store('menus', 'public');
+                // Berikan nama unik yang lebih pendek
+                $filename = uniqid('menu_') . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('menus', $filename, 'public');
                 $imagePaths[] = $path;
             }
         }
@@ -107,7 +132,10 @@ class MenuController extends Controller
 
             $newImagePaths = [];
             foreach ($request->file('images') as $image) {
-                $newImagePaths[] = $image->store('menus', 'public');
+                // Berikan nama unik yang lebih pendek
+                $filename = uniqid('menu_') . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('menus', $filename, 'public');
+                $newImagePaths[] = $path;
             }
 
             $data['images'] = json_encode($newImagePaths);
@@ -154,5 +182,4 @@ class MenuController extends Controller
 
         return view('your-view-name', compact('menus'));
     }
-
 }

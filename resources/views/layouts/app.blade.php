@@ -15,7 +15,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased bg-white text-gray-800">
-    <div class="min-h-screen bg-white">
+    <div class="min-h-screen bg-black flex flex-col">
         {{-- Navigasi utama --}}
         @include('layouts.navigation')
 
@@ -31,9 +31,12 @@
         @endif
 
         <!-- Page Content -->
-        <main>
+        <main class="flex-grow">
             @yield('content')
         </main>
+        
+        {{-- Footer --}}
+        @include('layouts.footer')
     </div>
 </body>
 </html>
