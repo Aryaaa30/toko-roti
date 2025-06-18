@@ -23,7 +23,7 @@ body {
   flex: 1;
 
   border-radius: 16px;
-  padding: 32px;
+ margin-top: 1rem;
   box-shadow: 0 4px 32px rgba(0,0,0,0.3);
   display: flex;
   gap: 32px;
@@ -47,7 +47,7 @@ body {
   margin-bottom: 18px;
   overflow: hidden;
   position: relative;
-  border: 1px solid #333;
+  border: 1px solid #222;
 }
 
 .carousel-inner {
@@ -107,15 +107,40 @@ body {
   border-radius: 14px;
 }
 
+/* Thumbnail container */
 .thumbnail-container {
   display: flex;
   gap: 12px;
+  width: 100%;
   justify-content: center;
   flex-wrap: nowrap;
   max-width: 100%;
+  /* Width depends on number of visible thumbnails */
+  width: calc(var(--visible-thumbs) * (70px + 12px) - 12px);
+  margin: 0 auto;
+}
+
+/* Scrollable thumbnail container if more than 5 thumbnails */
+.thumbnail-container.scrollable {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(254, 198, 228, 0.8) transparent;
+  /* Hide vertical scrollbar */
+  overflow-y: hidden;
+}
+
+/* For Webkit browsers */
+.thumbnail-container.scrollable::-webkit-scrollbar {
+  height: 6px;
+}
+
+.thumbnail-container.scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(254, 198, 228, 0.8);
+  border-radius: 3px;
 }
 
 .thumbnail {
+  /* Width and height fixed at 70px */
   width: 70px;
   height: 70px;
   border-radius: 10px;
@@ -125,6 +150,14 @@ body {
   background: #222;
   transition: border 0.2s, box-shadow 0.2s, transform 0.2s;
   box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  flex-shrink: 0;
+}
+
+/* Adjust thumbnail size if less than 5 thumbnails */
+.thumbnail-container:not(.scrollable) .thumbnail {
+  width: calc((100% - (var(--visible-thumbs) - 1) * 12px) / var(--visible-thumbs));
+  height: auto;
+  aspect-ratio: 1 / 1;
 }
 
 .thumbnail.active, .thumbnail:hover {
@@ -133,6 +166,7 @@ body {
   box-shadow: 0 4px 12px rgba(254, 198, 228, 0.3);
 }
 
+
 .product-details {
   flex: 1;
   display: flex;
@@ -140,16 +174,16 @@ body {
 }
 
 .title {
-  font-size: 2.1rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
   color: rgb(245, 245, 245);
   margin-bottom: 8px;
   letter-spacing: 0.5px;
 }
 
 .price {
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 900;
   color: rgb(254, 198, 228);
   margin-bottom: 18px;
 }
@@ -159,24 +193,22 @@ body {
   padding: 4px 14px;
   border-radius: 6px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 12px;
-  background: #222;
-  color: rgb(245, 245, 245);
+  background: rgb(254, 198, 228);
   letter-spacing: 0.5px;
   border: 1px solid #444;
 }
 
 .badge-available {
 
-  color: rgb(254, 198, 228);
+  color: rgb(0, 0, 0);
   border: 1px solid rgb(254, 198, 228);
 }
 
 .badge-unavailable {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  border: 1px solid #ef4444;
+  color: rgb(0, 0, 0);
+  border: 1px solid rgb(254, 198, 228);
 }
 
 .product-info-grid {
@@ -184,10 +216,9 @@ body {
   flex-direction: column;
   gap: 8px;
   margin-bottom: 18px;
-  padding: 16px;
-  background:rgb(0, 0, 0);
+  margin-top: 18px;
+
   border-radius: 12px;
-  border: 1px solid #333;
 }
 
 .info-item {
@@ -198,20 +229,20 @@ body {
 }
 
 .info-label {
-  font-weight: 600;
+  font-weight: 500;
   color: rgb(254, 198, 228);
   min-width: 80px;
 }
 
 .info-value {
-  font-weight: 700;
+  font-weight: 500;
   color: rgb(245, 245, 245);
 }
 
 .rating-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+
 }
 
 .star-icon {
@@ -221,13 +252,13 @@ body {
 
 hr {
   border: none;
-  border-top: 1px solid #333;
+  border-top: 1px solid #222;
   margin: 24px 0;
 }
 
 .detail-tabs {
   display: flex;
-  border-bottom: 1.5px solid #333;
+  border-bottom: 1.5px solid #222;
   margin-bottom: 18px;
   gap: 0;
 }
@@ -251,7 +282,7 @@ hr {
 }
 
 .detail-content {
-  font-size: 1.08rem;
+  font-size: 1rem;
   color: rgb(245, 245, 245);
   margin-top: 10px;
   margin-bottom: 0;
@@ -272,15 +303,15 @@ hr {
   height: fit-content;
   position: sticky;
   top: 32px;
-  border: 1px solid #333;
+  border: 1px solid #222;
 }
 
 .card-title {
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 800;
   color: rgb(254, 198, 228);
   margin-bottom: 20px;
-  text-align: center;
+  text-align: left;
 }
 
 .product-info {
@@ -291,7 +322,7 @@ hr {
   padding: 12px;
   background:rgb(0, 0, 0);
   border-radius: 12px;
-  border: 1px solid #333;
+  border: 1px solid #222;
 }
 
 .product-info img {
@@ -299,9 +330,8 @@ hr {
   height: 54px;
   border-radius: 10px;
   object-fit: cover;
-  background: #222;
   box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-  border: 1px solid #333;
+  border: 1px solid #222;
 }
 
 .product-name {
@@ -331,12 +361,11 @@ hr {
 .quantity-control {
   display: flex;
   align-items: center;
-  border: 1.5px solid #333;
+  border: 1.5px solid #222;
   border-radius: 10px;
   overflow: hidden;
   width: 104px;
   height: 40px;
-  background: #1a1a1a;
 }
 
 .quantity-control button {
@@ -399,7 +428,7 @@ hr {
   width: 100%;
   min-height: 80px;
   padding: 12px;
-  border: 1.5px solid #333;
+  border: 1.5px solid #222;
   border-radius: 10px;
   font-size: 14px;
   color: rgb(245, 245, 245);
@@ -421,19 +450,17 @@ hr {
 .subtotal-row {
   display: flex;
   justify-content: space-between;
-  font-size: 1.08rem;
+  align-items: center;
   margin-bottom: 20px;
-  padding: 12px;
-  background: #1a1a1a;
   border-radius: 10px;
   color: rgb(245, 245, 245);
-  border: 1px solid #333;
+  font-size: 1rem; /* Ukuran teks kecil untuk label "Subtotal" */
 }
 
 .subtotal-row strong {
-  font-weight: 700;
-  font-size: 1.15rem;
   color: rgb(254, 198, 228);
+  font-weight: bold;
+  font-size: 1.5rem; /* Lebih besar dari label */
 }
 
 .btn-primary {
@@ -561,68 +588,94 @@ hr {
 </style>
 
 <div class="container" role="main">
+<nav aria-label="Breadcrumb" style="font-size:1rem; font-family:Arial, sans-serif; margin-bottom:12px;">
+  <ol style="list-style:none; padding:0; margin:0; display:flex; flex-wrap:nowrap; align-items:center; gap:6px; color:#fff;">
+    <li><a href="/" style="color:rgb(245, 245, 245); text-decoration:none; font-weight:normal;">Home</a></li>
+    <li style="color:#888;">&gt;</li>
+    <li><a href="/bakeries" style="color:#fff; text-decoration:none; font-weight:normal;">Bakeries</a></li>
+    <li style="color:#888;">&gt;</li>
+    <li style="font-weight:normal;">{{ $menu->kategori }}</li>
+    <li style="color:#888;">&gt;</li>
+    <li style="color:#fec6e4; font-weight:normal;">{{ $menu->name }}</li>
+  </ol>
+</nav>
+
+
+
+
   <div class="main-content">
+    
     <!-- Card Kiri: Foto dan Atribut Produk -->
     <div class="left-card">
+      
       <!-- Bagian Gambar -->
       <section aria-label="Product images" class="image-section">
-        <div class="image-carousel" id="product-carousel">
-          @if($menu->images)
-            <div class="carousel-inner">
-              @php
-                $images = json_decode($menu->images);
-                $displayImages = is_array($images) ? array_slice($images, 0, 3) : [];
-              @endphp
-              @if(is_array($displayImages) && count($displayImages) > 0)
-                @foreach($displayImages as $index => $imagePath)
-                  <div class="carousel-item" data-index="{{ $index }}">
-                    <img src="{{ asset('storage/'.$imagePath) }}" alt="{{ $menu->name }} image {{ $index + 1 }}">
-                  </div>
-                @endforeach
-              @else
-                <div class="carousel-item">
-                  <img src="https://via.placeholder.com/400x400?text=No+Image" alt="No image">
-                </div>
-              @endif
+  <div class="image-carousel" id="product-carousel">
+    @if($menu->images)
+      <div class="carousel-inner">
+        @php
+          $images = json_decode($menu->images);
+          $displayImages = is_array($images) ? $images : [];
+        @endphp
+        @if(count($displayImages) > 0)
+          @foreach($displayImages as $index => $imagePath)
+            <div class="carousel-item" data-index="{{ $index }}">
+              <img src="{{ asset('storage/'.$imagePath) }}" alt="{{ $menu->name }} image {{ $index + 1 }}">
             </div>
-            @if(is_array($displayImages) && count($displayImages) > 1)
-              <button class="carousel-control carousel-control-prev" onclick="prevSlide()">&#10094;</button>
-              <button class="carousel-control carousel-control-next" onclick="nextSlide()">&#10095;</button>
-            @endif
-          @elseif($menu->image)
-            <img class="main-image" src="{{ asset('storage/'.$menu->image) }}" alt="{{ $menu->name }}">
-          @else
-            <img class="main-image" src="https://via.placeholder.com/400x400?text=No+Image" alt="No image">
-          @endif
-        </div>
-        
-        <!-- Thumbnail Gallery -->
-        @if($menu->images)
-          @php
-            $images = json_decode($menu->images);
-            $displayImages = is_array($images) ? array_slice($images, 0, 3) : [];
-          @endphp
-          @if(is_array($displayImages) && count($displayImages) > 1)
-            <div class="thumbnail-container" id="thumbnail-gallery">
-              @foreach($displayImages as $index => $imagePath)
-                <img 
-                  src="{{ asset('storage/'.$imagePath) }}" 
-                  alt="Thumbnail {{ $index + 1 }}" 
-                  class="thumbnail {{ $index === 0 ? 'active' : '' }}" 
-                  data-index="{{ $index }}"
-                  onclick="showSlide({{ $index }})"
-                >
-              @endforeach
-            </div>
-          @endif
+          @endforeach
+        @else
+          <div class="carousel-item">
+            <img src="https://via.placeholder.com/400x400?text=No+Image" alt="No image">
+          </div>
         @endif
-      </section>
+      </div>
+      @if(count($displayImages) > 1)
+        <button class="carousel-control carousel-control-prev" onclick="prevSlide()">&#10094;</button>
+        <button class="carousel-control carousel-control-next" onclick="nextSlide()">&#10095;</button>
+      @endif
+    @elseif($menu->image)
+      <img class="main-image" src="{{ asset('storage/'.$menu->image) }}" alt="{{ $menu->name }}">
+    @else
+      <img class="main-image" src="https://via.placeholder.com/400x400?text=No+Image" alt="No image">
+    @endif
+  </div>
+
+  <!-- Thumbnail Gallery -->
+  @if($menu->images)
+    @php
+      $images = json_decode($menu->images);
+      $displayImages = is_array($images) ? $images : [];
+      $thumbCount = count($displayImages);
+      $maxVisibleThumbs = 5;
+      $showScroll = $thumbCount > $maxVisibleThumbs;
+      $visibleThumbs = $showScroll ? $maxVisibleThumbs : $thumbCount;
+    @endphp
+    @if($thumbCount > 0)
+      <div 
+        class="thumbnail-container {{ $showScroll ? 'scrollable' : '' }}" 
+        id="thumbnail-gallery"
+        style="--visible-thumbs: {{ $visibleThumbs }}"
+      >
+        @foreach($displayImages as $index => $imagePath)
+          <img 
+            src="{{ asset('storage/'.$imagePath) }}" 
+            alt="Thumbnail {{ $index + 1 }}" 
+            class="thumbnail {{ $index === 0 ? 'active' : '' }}" 
+            data-index="{{ $index }}"
+            onclick="showSlide({{ $index }})"
+          >
+        @endforeach
+      </div>
+    @endif
+  @endif
+</section>
+
 
       <!-- Bagian Detail Produk -->
       <section aria-label="Product details" class="product-details">
         <h1 class="title">{{ $menu->name }}</h1>
 
-        <div class="price">Rp{{ number_format($menu->price, 0, ',', '.') }}</div>
+        <div class="price">Rp. {{ number_format($menu->price, 0, ',', '.') }}</div>
 
         <div>
           @if(isset($menu->available))
@@ -633,24 +686,9 @@ hr {
         </div>
 
         <!-- Info Grid Vertikal -->
-        <div class="product-info-grid">
-          <div class="info-item">
-            <span class="info-label">Kategori:</span>
-            <span class="info-value">{{ $menu->kategori }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Stok:</span>
-            <span class="info-value">{{ $menu->stok }}</span>
-          </div>
-          <div class="info-item rating-item">
-            <span class="info-label">Rating:</span>
-            <span class="star-icon">★</span>
-            <span class="info-value">{{ $menu->reviews->count() > 0 ? number_format($menu->reviews->avg('rating'), 1) : '0.0' }}</span>
-            <span style="color: #888;">({{ $menu->reviews->count() }} rating)</span>
-          </div>
-        </div>
+        
 
-        <hr/>
+  
 
         <nav class="detail-tabs" role="tablist">
           <button 
@@ -665,6 +703,29 @@ hr {
           </button>
         </nav>
 
+    <div class="product-info-grid">
+  <div class="info-item">
+    <span class="info-label">Kategori:</span>
+    <span class="info-value">{{ $menu->kategori }}</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">Stok:</span>
+    <span class="info-value">{{ $menu->stok }}</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">Terjual:</span>
+    <span class="info-value">{{ $menu->terjual ?? 0 }}</span>
+  </div>
+  <div class="info-item rating-item">
+    <span class="info-label">Rating:</span>
+    <span class="star-icon">★</span>
+    <span class="info-value">
+      {{ $menu->reviews->count() > 0 ? number_format($menu->reviews->avg('rating'), 1) : '0.0' }}
+    </span>
+    <span style="color: #888;">({{ $menu->reviews->count() }} rating)</span>
+  </div>
+</div>
+
         <section 
           class="detail-content" 
           id="tabpanel-detail" 
@@ -672,7 +733,6 @@ hr {
           aria-labelledby="tab-detail"
           tabindex="0"
         >
-          <p><strong>Deskripsi:</strong></p>
           <p>{{ $menu->description }}</p>
         </section>
       </section>
@@ -734,9 +794,13 @@ hr {
       </div>
 
       <div class="subtotal-row">
-        <span>Subtotal</span>
-        <strong id="subtotal">Rp{{ number_format($menu->price, 0, ',', '.') }}</strong>
-      </div>
+  <span>Subtotal</span>
+  <strong id="subtotal">
+    <span class="rp">Rp</span>{{ number_format($menu->price, 0, ',', '.') }}
+  </strong>
+</div>
+
+
 
       <form id="add-to-cart-form" action="{{ route('carts.store') }}" method="POST">
         @csrf
@@ -760,6 +824,8 @@ hr {
     <i class="fas fa-shopping-cart"></i>
   </div>
 </div>
+
+
 
 <script>
   // Carousel functionality

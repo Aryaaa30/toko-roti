@@ -3,6 +3,7 @@
 @section('content')
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <style>
   body {
@@ -115,6 +116,7 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   }
 
   .view-btn {
@@ -123,11 +125,22 @@
     border: none;
     cursor: pointer;
     color: #666;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .view-btn:hover {
+    background: #f8f8f8;
   }
 
   .view-btn.active {
     background: #d4a574;
     color: white;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
   }
 
   /* Sidebar and Content Layout */
@@ -264,12 +277,19 @@
     font-size: 12px;
     cursor: pointer;
     transition: all 0.3s;
+    margin-bottom: 8px;
+    display: inline-block;
   }
 
-  .tag:hover,
+  .tag:hover {
+    background: #d4a574;
+    color: white;
+  }
+  
   .tag.active {
     background: #d4a574;
     color: white;
+    font-weight: bold;
   }
 
   /* Product Grid */
@@ -278,6 +298,17 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 30px;
     margin-bottom: 50px;
+    transition: all 0.5s ease;
+  }
+  
+  .view-transition {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+  
+  .view-transition-end {
+    opacity: 1;
+    transform: scale(1);
   }
 
   .product-card {
@@ -285,9 +316,10 @@
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: all 0.3s ease;
     text-decoration: none;
     color: inherit;
+    position: relative;
   }
 
   .product-card:hover {
@@ -295,6 +327,145 @@
     box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     text-decoration: none;
     color: inherit;
+  }
+  
+  /* List View Specific Styles */
+  .product-card.list-view {
+    display: flex;
+    align-items: stretch;
+    transform: none;
+    border-left: 4px solid #d4a574;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: visible;
+    animation: fadeInUp 0.5s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .product-card.list-view:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background-color: #fffaf5;
+    cursor: pointer;
+  }
+  
+  .product-card.list-view:hover .view-details-msg {
+    color: #d4a574;
+    font-weight: 500;
+  }
+  
+  .product-card.list-view::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -4px;
+    height: 30%;
+    width: 4px;
+    background: linear-gradient(to bottom, #f1c40f, #d4a574);
+    border-radius: 2px 0 0 0;
+    transition: height 0.3s ease;
+  }
+  
+  .product-card.list-view:hover::before {
+    height: 100%;
+  }
+  
+  .product-card.list-view .product-title {
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: #333;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .product-card.list-view .product-title::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background-color: #d4a574;
+    transition: width 0.3s ease;
+  }
+  
+  .product-card.list-view:hover .product-title::after {
+    width: 100%;
+  }
+  
+  .product-card.list-view .product-price {
+    font-size: 18px;
+    color: #d4a574;
+    margin: 5px 0;
+    font-weight: 700;
+  }
+  
+  .product-card.list-view .product-meta {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
+  }
+  
+  .product-card.list-view .product-badge {
+    top: 10px;
+    left: 10px;
+    right: auto;
+  }
+  
+  .product-card.list-view .product-image-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .product-card.list-view:hover .product-image-container::after {
+    opacity: 1;
+  }
+  
+  .product-card.list-view .quick-action-btn {
+    transition: all 0.2s ease;
+  }
+  
+  .product-card.list-view .quick-action-btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  .product-card.list-view .add-to-cart:hover {
+    background-color: #c39366;
+  }
+  
+  .product-card.list-view .view-details:hover {
+    background-color: #e9ecef;
+  }
+  
+  .product-card.list-view .product-description {
+    position: relative;
+    padding-left: 10px;
+    border-left: 2px solid #f1f1f1;
+  }
+  
+  .product-card.list-view .rating-stars {
+    font-size: 16px;
   }
 
   .product-image-container {
@@ -567,8 +738,8 @@
       </select>
       
       <div class="view-toggle">
-        <button class="view-btn active" data-view="grid">⊞</button>
-        <button class="view-btn" data-view="list">☰</button>
+        <button class="view-btn active" data-view="grid" title="Grid View"><i class="fas fa-th"></i></button>
+        <button class="view-btn" data-view="list" title="List View"><i class="fas fa-list"></i></button>
       </div>
     </div>
   </div>
@@ -655,17 +826,16 @@
         @endforeach
       </div>
 
-      <!-- Tags -->
+      <!-- Filter Rating -->
       <div class="sidebar-section">
-        <h3>Tags</h3>
+        <h3>Filter Rating</h3>
         <div class="tags-container">
-          @php
-            $tags = ['Bagel', 'Bread stick', 'Croissant', 'French bread', 'Muffin', 'Oats', 'Rye', 'Whole bread', 'swiss roll'];
-          @endphp
-          
-          @foreach($tags as $tag)
-            <span class="tag" data-tag="{{ Str::slug($tag) }}">{{ $tag }}</span>
-          @endforeach
+          <span class="tag active" data-rating="0">All Ratings</span>
+          <span class="tag" data-rating="5">5 Stars ★★★★★</span>
+          <span class="tag" data-rating="4">4+ Stars ★★★★☆</span>
+          <span class="tag" data-rating="3">3+ Stars ★★★☆☆</span>
+          <span class="tag" data-rating="2">2+ Stars ★★☆☆☆</span>
+          <span class="tag" data-rating="1">1+ Star ★☆☆☆☆</span>
         </div>
       </div>
     </div>
@@ -753,14 +923,14 @@
 
       <!-- Pagination -->
       <div class="pagination-container">
-        <div class="pagination">
-          <button class="page-btn">&laquo;</button>
-          <button class="page-btn active">1</button>
-          <button class="page-btn">2</button>
-          <button class="page-btn">3</button>
-          <button class="page-btn">4</button>
-          <button class="page-btn">5</button>
-          <button class="page-btn">&raquo;</button>
+        <div class="pagination" id="pagination">
+          <button class="page-btn" data-action="prev">&laquo;</button>
+          <button class="page-btn active" data-page="1">1</button>
+          <button class="page-btn" data-page="2">2</button>
+          <button class="page-btn" data-page="3">3</button>
+          <button class="page-btn" data-page="4">4</button>
+          <button class="page-btn" data-page="5">5</button>
+          <button class="page-btn" data-action="next">&raquo;</button>
         </div>
       </div>
     </div>
@@ -773,6 +943,11 @@ let currentProducts = [];
 let filteredProducts = [];
 let carousels = {};
 
+// Global pagination variables
+let currentPage = 1;
+let itemsPerPage = 12;
+let totalPages = 1;
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   // Store all products for filtering
@@ -784,6 +959,18 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize product carousels
   initializeCarousels();
+  
+  // Initialize pagination
+  initializePagination();
+  
+  // Restore view from session storage
+  const savedView = sessionStorage.getItem('productView');
+  if (savedView) {
+    const viewBtn = document.querySelector(`.view-btn[data-view="${savedView}"]`);
+    if (viewBtn) {
+      toggleView(savedView, viewBtn);
+    }
+  }
   
   // Update results count
   updateResultsCount();
@@ -824,11 +1011,20 @@ function initializeEventListeners() {
     });
   });
   
-  // Tags
+  // Rating filter
   document.querySelectorAll('.tag').forEach(tag => {
     tag.addEventListener('click', function() {
-      this.classList.toggle('active');
-      // You can add tag filtering logic here
+      // Remove active class from all tags
+      document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+      
+      // Add active class to clicked tag
+      this.classList.add('active');
+      
+      // Get rating value
+      const minRating = parseFloat(this.getAttribute('data-rating'));
+      
+      // Apply all active filters
+      applyAllFilters();
     });
   });
 }
@@ -840,41 +1036,13 @@ function filterByCategory(category, element) {
   });
   element.classList.add('active');
   
-  // Filter products
-  currentProducts.forEach(card => {
-    const cardCategory = card.getAttribute('data-category');
-    if (category === 'all' || cardCategory === category) {
-      card.style.display = '';
-    } else {
-      card.style.display = 'none';
-    }
-  });
-  
-  // Update filtered products array
-  filteredProducts = currentProducts.filter(card => {
-    return category === 'all' || card.getAttribute('data-category') === category;
-  });
-  
-  updateResultsCount();
+  // Apply all filters
+  applyAllFilters();
 }
 
 function filterBySearch(searchTerm) {
-  const term = searchTerm.toLowerCase();
-  
-  currentProducts.forEach(card => {
-    const name = card.getAttribute('data-name');
-    const isVisible = card.style.display !== 'none';
-    
-    if (isVisible) {
-      if (name.includes(term)) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-      }
-    }
-  });
-  
-  updateResultsCount();
+  // Apply all filters
+  applyAllFilters();
 }
 
 function sortProducts(sortBy) {
@@ -901,22 +1069,8 @@ function sortProducts(sortBy) {
 }
 
 function applyPriceFilter() {
-  const maxPrice = parseInt(document.getElementById('priceRange').value);
-  
-  currentProducts.forEach(card => {
-    const price = parseInt(card.getAttribute('data-price'));
-    const isVisible = card.style.display !== 'none';
-    
-    if (isVisible) {
-      if (price <= maxPrice) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-      }
-    }
-  });
-  
-  updateResultsCount();
+  // Apply all filters
+  applyAllFilters();
 }
 
 function toggleView(view, element) {
@@ -928,30 +1082,305 @@ function toggleView(view, element) {
   
   const grid = document.getElementById('productGrid');
   
+  // Add transition class
+  grid.classList.add('view-transition');
+  
+  // Store current view in session storage
+  sessionStorage.setItem('productView', view);
+  
   if (view === 'list') {
     grid.style.gridTemplateColumns = '1fr';
     grid.querySelectorAll('.product-card').forEach(card => {
-      card.style.display = card.style.display === 'none' ? 'none' : 'flex';
+      if (card.style.display === 'none') return;
+      
+      // Apply list view styling
+      card.classList.add('list-view');
+      
+      // Reorganize content for list view
+      const imageContainer = card.querySelector('.product-image-container');
+      const productInfo = card.querySelector('.product-info');
+      
+      // Set dimensions and layout
+      card.style.display = 'flex';
       card.style.flexDirection = 'row';
-      card.style.height = '150px';
+      card.style.height = '180px';
+      card.style.padding = '0';
+      
+      // Adjust image container
+      imageContainer.style.width = '25%';
+      imageContainer.style.minWidth = '180px';
+      imageContainer.style.height = '100%';
+      imageContainer.style.borderRadius = '8px 0 0 8px';
+      imageContainer.style.boxShadow = 'inset -10px 0 10px -10px rgba(0,0,0,0.1)';
+      imageContainer.style.position = 'relative';
+      imageContainer.style.overflow = 'hidden';
+      
+      // Adjust product info
+      productInfo.style.width = '75%';
+      productInfo.style.display = 'flex';
+      productInfo.style.flexDirection = 'column';
+      productInfo.style.justifyContent = 'space-between';
+      productInfo.style.padding = '15px 20px';
+      
+      // Create description element if it doesn't exist
+      let descriptionEl = card.querySelector('.product-description');
+      if (!descriptionEl) {
+        // Get product name to fetch description
+        const productName = card.getAttribute('data-name');
+        const productCategory = card.getAttribute('data-category');
+        
+        // Create category badge
+        const categoryBadge = document.createElement('span');
+        categoryBadge.className = 'category-badge';
+        categoryBadge.textContent = productCategory.replace(/-/g, ' ');
+        categoryBadge.style.display = 'inline-block';
+        categoryBadge.style.padding = '3px 8px';
+        categoryBadge.style.backgroundColor = '#f8f9fa';
+        categoryBadge.style.color = '#666';
+        categoryBadge.style.borderRadius = '12px';
+        categoryBadge.style.fontSize = '11px';
+        categoryBadge.style.fontWeight = '600';
+        categoryBadge.style.textTransform = 'uppercase';
+        categoryBadge.style.letterSpacing = '0.5px';
+        categoryBadge.style.marginLeft = '10px';
+        categoryBadge.style.verticalAlign = 'middle';
+        
+        // Create description element
+        descriptionEl = document.createElement('div');
+        descriptionEl.className = 'product-description';
+        descriptionEl.style.fontSize = '14px';
+        descriptionEl.style.color = '#666';
+        descriptionEl.style.margin = '10px 0';
+        descriptionEl.style.lineHeight = '1.4';
+        
+        // Add description text (this would ideally come from your database)
+        descriptionEl.textContent = `Delicious ${productName} from our collection. Perfect for any occasion.`;
+        
+        // Insert after product title
+        const titleEl = productInfo.querySelector('.product-title');
+        titleEl.appendChild(categoryBadge);
+        titleEl.parentNode.insertBefore(descriptionEl, titleEl.nextSibling);
+      }
+      
+      // Add rating display
+      let ratingDisplay = card.querySelector('.list-rating-display');
+      if (!ratingDisplay) {
+        const rating = parseFloat(card.getAttribute('data-rating')) || 0;
+        
+        // Create rating display
+        ratingDisplay = document.createElement('div');
+        ratingDisplay.className = 'list-rating-display';
+        ratingDisplay.style.display = 'flex';
+        ratingDisplay.style.alignItems = 'center';
+        ratingDisplay.style.gap = '5px';
+        ratingDisplay.style.marginTop = '10px';
+        ratingDisplay.style.marginBottom = '15px';
+        
+        // Create rating stars
+        const starsContainer = document.createElement('div');
+        starsContainer.style.color = '#ffc107';
+        starsContainer.style.fontSize = '16px';
+        
+        // Generate stars based on rating
+        let starsHTML = '';
+        for (let i = 1; i <= 5; i++) {
+          if (i <= Math.floor(rating)) {
+            starsHTML += '<i class="fas fa-star"></i>';
+          } else if (i - 0.5 <= rating) {
+            starsHTML += '<i class="fas fa-star-half-alt"></i>';
+          } else {
+            starsHTML += '<i class="far fa-star"></i>';
+          }
+        }
+        starsContainer.innerHTML = starsHTML;
+        
+        // Create rating text
+        const ratingText = document.createElement('span');
+        ratingText.textContent = `${rating.toFixed(1)} (${Math.floor(Math.random() * 50) + 5} reviews)`;
+        ratingText.style.fontSize = '14px';
+        ratingText.style.color = '#666';
+        
+        ratingDisplay.appendChild(starsContainer);
+        ratingDisplay.appendChild(ratingText);
+        
+        // Insert after description
+        const descriptionEl = card.querySelector('.product-description');
+        if (descriptionEl) {
+          descriptionEl.parentNode.insertBefore(ratingDisplay, descriptionEl.nextSibling);
+        }
+      }
+      
+      // Add a "Click to view details" message
+      let viewDetailsMsg = card.querySelector('.view-details-msg');
+      if (!viewDetailsMsg) {
+        viewDetailsMsg = document.createElement('div');
+        viewDetailsMsg.className = 'view-details-msg';
+        viewDetailsMsg.style.textAlign = 'center';
+        viewDetailsMsg.style.color = '#666';
+        viewDetailsMsg.style.fontSize = '13px';
+        viewDetailsMsg.style.marginTop = '15px';
+        viewDetailsMsg.style.fontStyle = 'italic';
+        
+        // Insert before product meta
+        const metaEl = productInfo.querySelector('.product-meta');
+        productInfo.insertBefore(viewDetailsMsg, metaEl);
+      }
     });
   } else {
     grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
     grid.querySelectorAll('.product-card').forEach(card => {
-      card.style.display = card.style.display === 'none' ? 'none' : 'block';
+      if (card.style.display === 'none') return;
+      
+      // Remove list view styling
+      card.classList.remove('list-view');
+      
+      // Reset to grid view
+      card.style.display = 'block';
       card.style.flexDirection = '';
       card.style.height = '';
+      card.style.padding = '';
+      
+      // Reset image container
+      const imageContainer = card.querySelector('.product-image-container');
+      imageContainer.style.width = '';
+      imageContainer.style.minWidth = '';
+      imageContainer.style.height = '250px';
+      imageContainer.style.borderRadius = '';
+      
+      // Reset product info
+      const productInfo = card.querySelector('.product-info');
+      productInfo.style.width = '';
+      productInfo.style.display = '';
+      productInfo.style.flexDirection = '';
+      productInfo.style.justifyContent = '';
+      productInfo.style.padding = '20px';
+      
+      // Remove list-view specific elements
+      const descriptionEl = card.querySelector('.product-description');
+      if (descriptionEl) {
+        descriptionEl.remove();
+      }
+      
+      const ratingDisplay = card.querySelector('.list-rating-display');
+      if (ratingDisplay) {
+        ratingDisplay.remove();
+      }
+      
+      const viewDetailsMsg = card.querySelector('.view-details-msg');
+      if (viewDetailsMsg) {
+        viewDetailsMsg.remove();
+      }
     });
   }
+  
+  // Complete the transition effect
+  setTimeout(() => {
+    grid.classList.add('view-transition-end');
+    setTimeout(() => {
+      grid.classList.remove('view-transition');
+      grid.classList.remove('view-transition-end');
+    }, 300);
+  }, 50);
 }
 
 function updateResultsCount() {
-  const visibleProducts = currentProducts.filter(card => card.style.display !== 'none');
-  const total = visibleProducts.length;
+  filteredProducts = currentProducts.filter(card => card.style.display !== 'none');
+  const total = filteredProducts.length;
   
-  document.getElementById('resultStart').textContent = total > 0 ? '1' : '0';
-  document.getElementById('resultEnd').textContent = Math.min(12, total);
-  document.getElementById('totalResults').textContent = total;
+  // Update total pages
+  totalPages = Math.ceil(total / itemsPerPage);
+  
+  // Ensure current page is valid
+  if (currentPage > totalPages) {
+    currentPage = Math.max(1, totalPages);
+  }
+  
+  // Update pagination UI
+  updatePaginationUI();
+  
+  // Show products for current page
+  showProductsForCurrentPage();
+}
+
+function filterByRating(minRating) {
+  currentProducts.forEach(card => {
+    // If minRating is 0, show all products
+    if (minRating === 0) {
+      card.style.display = '';
+      return;
+    }
+    
+    const rating = parseFloat(card.getAttribute('data-rating')) || 0;
+    
+    if (rating >= minRating) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  
+  updateResultsCount();
+}
+
+function applyAllFilters() {
+  // Reset all products to visible (for filtering purposes)
+  currentProducts.forEach(card => {
+    card.style.display = '';
+  });
+  
+  // Apply category filter
+  const activeCategory = document.querySelector('.category-item.active').getAttribute('data-category');
+  if (activeCategory !== 'all') {
+    currentProducts.forEach(card => {
+      const cardCategory = card.getAttribute('data-category');
+      if (cardCategory !== activeCategory) {
+        card.style.display = 'none';
+      }
+    });
+  }
+  
+  // Apply rating filter
+  const activeRating = parseFloat(document.querySelector('.tag.active').getAttribute('data-rating'));
+  if (activeRating > 0) {
+    currentProducts.forEach(card => {
+      if (card.style.display !== 'none') {
+        const rating = parseFloat(card.getAttribute('data-rating')) || 0;
+        if (rating < activeRating) {
+          card.style.display = 'none';
+        }
+      }
+    });
+  }
+  
+  // Apply price filter
+  const maxPrice = parseInt(document.getElementById('priceRange').value);
+  currentProducts.forEach(card => {
+    if (card.style.display !== 'none') {
+      const price = parseInt(card.getAttribute('data-price'));
+      if (price > maxPrice) {
+        card.style.display = 'none';
+      }
+    }
+  });
+  
+  // Apply search filter
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  if (searchTerm) {
+    currentProducts.forEach(card => {
+      if (card.style.display !== 'none') {
+        const name = card.getAttribute('data-name');
+        if (!name.includes(searchTerm)) {
+          card.style.display = 'none';
+        }
+      }
+    });
+  }
+  
+  // Reset to first page when filters change
+  currentPage = 1;
+  
+  // Update results count and pagination
+  updateResultsCount();
 }
 
 // Product Image Carousel Functions
@@ -1073,6 +1502,133 @@ function stopCarouselAutoplay(productId) {
     clearInterval(carousel.interval);
     carousel.interval = null;
   }
+}
+
+// Pagination Functions
+function initializePagination() {
+  // Calculate total pages
+  totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  
+  // Update pagination UI
+  updatePaginationUI();
+  
+  // Add event listeners to pagination buttons
+  document.querySelectorAll('.page-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const action = this.getAttribute('data-action');
+      const page = parseInt(this.getAttribute('data-page'));
+      
+      if (action === 'prev') {
+        if (currentPage > 1) {
+          goToPage(currentPage - 1);
+        }
+      } else if (action === 'next') {
+        if (currentPage < totalPages) {
+          goToPage(currentPage + 1);
+        }
+      } else if (page) {
+        goToPage(page);
+      }
+    });
+  });
+  
+  // Show first page
+  goToPage(1);
+}
+
+function updatePaginationUI() {
+  const pagination = document.getElementById('pagination');
+  if (!pagination) return;
+  
+  // Clear existing page buttons (except first, prev, next, last)
+  const pageButtons = Array.from(pagination.querySelectorAll('.page-btn')).filter(btn => 
+    !btn.hasAttribute('data-action')
+  );
+  
+  pageButtons.forEach(btn => btn.remove());
+  
+  // Get prev and next buttons
+  const prevBtn = pagination.querySelector('[data-action="prev"]');
+  const nextBtn = pagination.querySelector('[data-action="next"]');
+  
+  // Disable/enable prev/next buttons
+  prevBtn.disabled = currentPage === 1;
+  nextBtn.disabled = currentPage === totalPages;
+  
+  // Add page buttons
+  const maxVisiblePages = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+  
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+  
+  // Insert page buttons before the next button
+  for (let i = startPage; i <= endPage; i++) {
+    const pageBtn = document.createElement('button');
+    pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+    pageBtn.setAttribute('data-page', i);
+    pageBtn.textContent = i;
+    
+    pagination.insertBefore(pageBtn, nextBtn);
+  }
+}
+
+function goToPage(page) {
+  currentPage = page;
+  
+  // Update active page button
+  document.querySelectorAll('.page-btn').forEach(btn => {
+    const btnPage = parseInt(btn.getAttribute('data-page'));
+    if (btnPage === currentPage) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  // Show products for current page
+  showProductsForCurrentPage();
+  
+  // Update pagination UI
+  updatePaginationUI();
+  
+  // Scroll to top of product grid
+  const grid = document.getElementById('productGrid');
+  if (grid) {
+    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function showProductsForCurrentPage() {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  
+  // Hide all products first
+  currentProducts.forEach(product => {
+    product.style.display = 'none';
+  });
+  
+  // Show only the products for the current page
+  filteredProducts.slice(startIndex, endIndex).forEach(product => {
+    // Check if we're in list or grid view
+    const isListView = document.querySelector('.view-btn[data-view="list"]').classList.contains('active');
+    if (isListView) {
+      product.style.display = 'flex';
+    } else {
+      product.style.display = 'block';
+    }
+  });
+  
+  // Update results info
+  const totalVisible = filteredProducts.length;
+  const start = totalVisible > 0 ? startIndex + 1 : 0;
+  const end = Math.min(endIndex, totalVisible);
+  
+  document.getElementById('resultStart').textContent = start;
+  document.getElementById('resultEnd').textContent = end;
+  document.getElementById('totalResults').textContent = totalVisible;
 }
 </script>
 

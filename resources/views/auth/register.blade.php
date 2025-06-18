@@ -179,6 +179,12 @@
         <div class="error">{{ $message }}</div>
       @enderror
 
+      <!-- Username -->
+      <input type="text" name="username" placeholder="Username*" value="{{ old('username') }}" required />
+      @error('username')
+        <div class="error">{{ $message }}</div>
+      @enderror
+
       <!-- Email -->
       <input type="email" name="email" placeholder="Email*" value="{{ old('email') }}" required />
       @error('email')

@@ -19,9 +19,9 @@ class MenuController extends Controller
         $category = $request->query('kategori');
 
         if ($category) {
-            $menus = Menu::where('kategori', $category)->get();
+            $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->get();
         } else {
-            $menus = Menu::with('reviews')->get();
+            $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->get();
         }
 
         if (auth()->check() && auth()->user()->is_admin) {
@@ -40,9 +40,9 @@ class MenuController extends Controller
         $category = $request->query('kategori');
 
         if ($category) {
-            $menus = Menu::where('kategori', $category)->get();
+            $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->get();
         } else {
-            $menus = Menu::with('reviews')->get();
+            $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->get();
         }
 
         if (auth()->check() && auth()->user()->is_admin) {
@@ -76,11 +76,12 @@ class MenuController extends Controller
             'price' => 'required|numeric|min:0',
             'available' => 'required|boolean',
             'stok' => 'required|integer|min:0',
-            'kategori' => 'required|in:Roti Manis,Roti Tawar,Kue (Cake),Donat,Pastry',
+            'kategori' => 'required|in:Roti Manis,Roti Tawar,Kue (Cake),Donat,Pastry,birthday',
             'images.*' => 'nullable|image|max:2048', // validasi setiap gambar
+            'flavor' => 'nullable|string|max:255', // validasi untuk rasa kue
         ]);
 
-        $data = $request->only(['name', 'description', 'price', 'available', 'stok', 'kategori']);
+        $data = $request->only(['name', 'description', 'price', 'available', 'stok', 'kategori', 'flavor']);
 
         // Upload dan simpan banyak gambar
         $imagePaths = [];
@@ -95,7 +96,12 @@ class MenuController extends Controller
 
         $data['images'] = json_encode($imagePaths); // simpan sebagai JSON
 
-        Menu::create($data);
+        $menu = Menu::create($data);
+
+        // If it's a birthday cake, redirect to the birthday admin page
+        if ($request->kategori === 'birthday') {
+            return redirect()->route('birthday.admin')->with('success', 'Kue ulang tahun berhasil ditambahkan!');
+        }
 
         return redirect()->route('menus.index')->with('success', 'Menu berhasil ditambahkan!');
     }
@@ -113,11 +119,12 @@ class MenuController extends Controller
             'price' => 'required|numeric|min:0',
             'available' => 'required|boolean',
             'stok' => 'required|integer|min:0',
-            'kategori' => 'required|in:Roti Manis,Roti Tawar,Kue (Cake),Donat,Pastry',
+            'kategori' => 'required|in:Roti Manis,Roti Tawar,Kue (Cake),Donat,Pastry,birthday',
             'images.*' => 'nullable|image|max:2048',
+            'flavor' => 'nullable|string|max:255',
         ]);
 
-        $data = $request->only(['name', 'description', 'price', 'available', 'stok', 'kategori']);
+        $data = $request->only(['name', 'description', 'price', 'available', 'stok', 'kategori', 'flavor']);
 
         // Upload gambar baru dan hapus lama
         if ($request->hasFile('images')) {
@@ -143,6 +150,11 @@ class MenuController extends Controller
 
         $menu->update($data);
 
+        // If it's a birthday cake, redirect to the birthday admin page
+        if ($menu->kategori === 'birthday') {
+            return redirect()->route('birthday.admin')->with('success', 'Kue ulang tahun berhasil diupdate!');
+        }
+
         return redirect()->route('menus.index')->with('success', 'Menu berhasil diupdate!');
     }
 
@@ -156,7 +168,13 @@ class MenuController extends Controller
             }
         }
 
+        $isBirthday = $menu->kategori === 'birthday';
+        
         $menu->delete();
+
+        if ($isBirthday) {
+            return redirect()->route('birthday.admin')->with('success', 'Kue ulang tahun berhasil dihapus!');
+        }
 
         return redirect()->route('menus.index')->with('success', 'Menu berhasil dihapus!');
     }
@@ -165,6 +183,11 @@ class MenuController extends Controller
     {
         // Tangkap kategori yang dikirim di URL
         $kategori = $request->type;
+
+        // If birthday is requested, redirect to birthday page
+        if ($kategori === 'birthday') {
+            return redirect()->route('birthday');
+        }
 
         // Query hanya menu dengan kategori tersebut
         $menus = Menu::where('kategori', $kategori)->with('reviews')->get();
@@ -176,8 +199,11 @@ class MenuController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $menus = Menu::where('name', 'LIKE', "%{$query}%")
-                    ->orWhere('kategori', 'LIKE', "%{$query}%")
+        $menus = Menu::where(function($q) use ($query) {
+                        $q->where('name', 'LIKE', "%{$query}%")
+                          ->orWhere('kategori', 'LIKE', "%{$query}%");
+                    })
+                    ->where('kategori', '!=', 'birthday')
                     ->get();
 
         return view('your-view-name', compact('menus'));

@@ -155,6 +155,9 @@
 </style>
 
 <div class="form-container">
+    <a href="{{ route('birthday') }}" class="btn btn-sm" style="margin-bottom: 15px; color: #f783ac;">
+        <i class="fas fa-arrow-left"></i> Kembali
+    </a>
     <h2 class="form-title">Tambah Kue Ulang Tahun</h2>
     <p class="form-subtitle">Isi formulir di bawah ini untuk menambahkan kue ulang tahun baru.</p>
 
@@ -170,7 +173,7 @@
 
     <form action="{{ route('menus.store') }}" method="POST" enctype="multipart/form-data" id="createBirthdayForm">
         @csrf
-        <input type="hidden" name="type" value="birthday">
+        <input type="hidden" name="kategori" value="birthday">
 
         <div class="form-row">
             <div class="form-section">
@@ -187,30 +190,17 @@
             </div>
         </div>
 
-        <div class="form-row">
-            <div class="form-section">
-                <label for="size" class="form-label required-label">Ukuran Kue</label>
-                <select name="size" id="size" class="form-control @error('size') is-invalid @enderror" required>
-                    <option value="" disabled {{ old('size') === null ? 'selected' : '' }}>Pilih Ukuran</option>
-                    <option value="Small (15cm)" {{ old('size') == 'Small (15cm)' ? 'selected' : '' }}>Small (15cm)</option>
-                    <option value="Medium (20cm)" {{ old('size') == 'Medium (20cm)' ? 'selected' : '' }}>Medium (20cm)</option>
-                    <option value="Large (25cm)" {{ old('size') == 'Large (25cm)' ? 'selected' : '' }}>Large (25cm)</option>
-                    <option value="Extra Large (30cm)" {{ old('size') == 'Extra Large (30cm)' ? 'selected' : '' }}>Extra Large (30cm)</option>
-                </select>
-            </div>
-
-            <div class="form-section">
-                <label for="flavor" class="form-label required-label">Rasa Kue</label>
-                <select name="flavor" id="flavor" class="form-control @error('flavor') is-invalid @enderror" required>
-                    <option value="" disabled {{ old('flavor') === null ? 'selected' : '' }}>Pilih Rasa</option>
-                    <option value="Coklat" {{ old('flavor') == 'Coklat' ? 'selected' : '' }}>Coklat</option>
-                    <option value="Vanilla" {{ old('flavor') == 'Vanilla' ? 'selected' : '' }}>Vanilla</option>
-                    <option value="Strawberry" {{ old('flavor') == 'Strawberry' ? 'selected' : '' }}>Strawberry</option>
-                    <option value="Red Velvet" {{ old('flavor') == 'Red Velvet' ? 'selected' : '' }}>Red Velvet</option>
-                    <option value="Tiramisu" {{ old('flavor') == 'Tiramisu' ? 'selected' : '' }}>Tiramisu</option>
-                    <option value="Blueberry" {{ old('flavor') == 'Blueberry' ? 'selected' : '' }}>Blueberry</option>
-                </select>
-            </div>
+        <div class="form-section">
+            <label for="flavor" class="form-label required-label">Rasa Kue</label>
+            <select name="flavor" id="flavor" class="form-control @error('flavor') is-invalid @enderror" required>
+                <option value="" disabled {{ old('flavor') === null ? 'selected' : '' }}>Pilih Rasa</option>
+                <option value="Coklat" {{ old('flavor') == 'Coklat' ? 'selected' : '' }}>Coklat</option>
+                <option value="Vanilla" {{ old('flavor') == 'Vanilla' ? 'selected' : '' }}>Vanilla</option>
+                <option value="Strawberry" {{ old('flavor') == 'Strawberry' ? 'selected' : '' }}>Strawberry</option>
+                <option value="Red Velvet" {{ old('flavor') == 'Red Velvet' ? 'selected' : '' }}>Red Velvet</option>
+                <option value="Tiramisu" {{ old('flavor') == 'Tiramisu' ? 'selected' : '' }}>Tiramisu</option>
+                <option value="Blueberry" {{ old('flavor') == 'Blueberry' ? 'selected' : '' }}>Blueberry</option>
+            </select>
         </div>
 
         <div class="form-section">
@@ -244,7 +234,7 @@
         </div>
 
         <div class="btn-group">
-            <a href="{{ route('menus.index') }}" class="btn btn-outline-secondary">Batal</a>
+            <a href="{{ route('birthday') }}" class="btn btn-outline-secondary">Batal</a>
             <button type="submit" class="btn btn-primary">Simpan Kue</button>
         </div>
     </form>

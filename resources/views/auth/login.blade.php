@@ -49,6 +49,7 @@
       flex-direction: column;
       gap: 20px;
     }
+    input[type="text"],
     input[type="email"],
     input[type="password"] {
       font-family: 'Roboto', sans-serif;
@@ -60,6 +61,7 @@
       outline-color: transparent;
       transition: outline-color 0.2s ease;
     }
+    input[type="text"]:focus,
     input[type="email"]:focus,
     input[type="password"]:focus {
       outline-color: #222;
@@ -156,8 +158,8 @@
     <form method="POST" action="{{ route('login') }}">
       @csrf
 
-      <input type="email" name="email" placeholder="Email*" required aria-required="true" value="{{ old('email') }}" />
-      @error('email')
+      <input type="text" name="username" placeholder="Username*" required aria-required="true" value="{{ old('username') }}" />
+      @error('username')
         <div class="error">{{ $message }}</div>
       @enderror
 

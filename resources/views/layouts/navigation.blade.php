@@ -20,7 +20,7 @@
         }
     </script>
 </head>
-<body class="bg-white">
+<body class="">
 
 <nav x-data="{ 
         showSearch: false, 
@@ -68,7 +68,7 @@
 
             <!-- Logo -->
             <div class="flex-shrink-0">
-                <a href="/" class="text-xl font-bold text-pink-primary transition-colors duration-200">
+                <a href="/" class="text-xl font-medium text-pink-primary transition-colors duration-200">
                     Bake My Day
                 </a>
             </div>

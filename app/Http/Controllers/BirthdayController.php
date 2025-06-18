@@ -9,6 +9,16 @@ use Illuminate\Support\Facades\DB;
 class BirthdayController extends Controller
 {
     /**
+     * Show the form for creating a new birthday cake.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('birthday.create');
+    }
+    
+    /**
      * Display the birthday page based on user role
      *
      * @return \Illuminate\Http\Response
@@ -53,6 +63,13 @@ class BirthdayController extends Controller
         if (auth()->check() && auth()->user()->is_admin) {
             return redirect()->route('birthday.admin');
         }
-        return view('birthday.birthday_user');
+        
+        // Get available birthday cakes
+        $birthdayCakes = Menu::where('kategori', 'birthday')
+            ->where('available', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return view('birthday.birthday_user', compact('birthdayCakes'));
     }
 }

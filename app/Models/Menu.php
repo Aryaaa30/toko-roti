@@ -17,7 +17,8 @@ class Menu extends Model
         'images',
         'stok',
         'kategori',
-        'available'
+        'available',
+        'flavor'
     ];
 
     public function reviews()

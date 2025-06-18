@@ -80,6 +80,7 @@ Route::get('/categories', [MenuController::class, 'categories'])->name('categori
 Route::get('/birthday', [BirthdayController::class, 'index'])->name('birthday');
 Route::get('/birthday/admin', [BirthdayController::class, 'adminPage'])->middleware(['auth', 'admin'])->name('birthday.admin');
 Route::get('/birthday/user', [BirthdayController::class, 'userPage'])->middleware(['auth'])->name('birthday.user');
+Route::get('/birthday/create', [BirthdayController::class, 'create'])->middleware(['auth', 'admin'])->name('birthday.create');
 Route::get('/about', function() {
     return view('about_us');
 })->name('about');

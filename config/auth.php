@@ -73,6 +73,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Authentication Username
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the column that should be used as the username
+    | when authenticating users of your application.
+    |
+    */
+
+    'username' => 'username',
+
+    /*
+    |--------------------------------------------------------------------------
     | Resetting Passwords
     |--------------------------------------------------------------------------
     |

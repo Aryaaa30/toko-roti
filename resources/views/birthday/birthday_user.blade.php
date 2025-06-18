@@ -43,133 +43,83 @@
         </div>
     </div>
 
-    <!-- Featured Products -->
+    <!-- Birthday Cakes from Database -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold text-gray-900">Featured Birthday Treats</h2>
+            <h2 class="text-2xl font-bold text-gray-900">Our Birthday Cakes</h2>
             <div class="flex items-center">
                 <span class="text-gray-500 mr-2">Filter:</span>
-                <select class="border border-gray-300 rounded-md py-1 px-3 focus:outline-none focus:ring-2 focus:ring-pink-primary">
-                    <option>Featured</option>
-                    <option>Best Selling</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
+                <select id="sortSelect" class="border border-gray-300 rounded-md py-1 px-3 focus:outline-none focus:ring-2 focus:ring-pink-primary">
+                    <option value="featured">Featured</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
                 </select>
             </div>
         </div>
 
-        <!-- First Row of Products -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <!-- Product 1 -->
-            <div class="bg-[#FFF6EA] rounded-lg overflow-hidden shadow-md">
-                <div class="relative">
-                    <img src="{{ asset('images/birthday.jpg') }}" alt="Birthday Truffle Gift Pack" 
-                         class="w-full h-64 object-cover">
-                    <div class="absolute top-3 left-3 bg-black text-white text-xs px-2 py-1 rounded">BEST SELLER</div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2">BIRTHDAY TRUFFLE GIFT PACK</h3>
-                    <p class="text-gray-600 mb-4">We rolled all the childhood flavor of our signature cake into these rainbow-flecked, vanilla happy bites...</p>
-                    <div class="flex justify-center">
-                        <button class="w-full bg-black hover:bg-pink-primary text-white font-semibold py-3 px-4 rounded transition duration-200">
-                            Add to Cart - $43
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 2 -->
-            <div class="bg-[#FFF6EA] rounded-lg overflow-hidden shadow-md">
-                <div class="relative">
-                    <img src="{{ asset('images/birthday.jpg') }}" alt="The Big B'Day Gift" 
-                         class="w-full h-64 object-cover">
-                    <div class="absolute top-3 left-3 bg-black text-white text-xs px-2 py-1 rounded">BUNDLE & SAVE</div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2">THE BIG B'DAY GIFT</h3>
-                    <p class="text-gray-600 mb-4">A birthday flavored no-brainer that brings together all the heavy hitters for an all-out celebration. This...</p>
-                    <div class="flex justify-center">
-                        <button class="w-full bg-black hover:bg-pink-primary text-white font-semibold py-3 px-4 rounded transition duration-200">
-                            Add to Cart - $93
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 3 -->
-            <div class="bg-[#FFF6EA] rounded-lg overflow-hidden shadow-md">
-                <div class="relative">
-                    <img src="{{ asset('images/birthday.jpg') }}" alt="Birthday Bites & Pie" 
-                         class="w-full h-64 object-cover">
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2">BIRTHDAY BITES & PIE</h3>
-                    <p class="text-gray-600 mb-4">Say happy birthday with the Birthday Sampler Box! Indulge in a variety of Bake My Day's...</p>
-                    <div class="flex justify-center">
-                        <button class="w-full bg-black hover:bg-pink-primary text-white font-semibold py-3 px-4 rounded transition duration-200">
-                            Add to Cart - $63
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Second Row of Products -->
+        @if(isset($birthdayCakes) && count($birthdayCakes) > 0)
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Product 4 -->
-            <div class="bg-[#FFF6EA] rounded-lg overflow-hidden shadow-md">
+            @foreach($birthdayCakes as $cake)
+            <div class="bg-[#FFF6EA] rounded-lg overflow-hidden shadow-md cake-item" 
+                 data-price="{{ $cake->price }}">
                 <div class="relative">
-                    <img src="{{ asset('images/birthday.jpg') }}" alt="Birthday Cake" 
-                         class="w-full h-64 object-cover">
-                    <div class="absolute top-3 left-3 bg-pink-primary text-white text-xs px-2 py-1 rounded">BEST SELLER</div>
+                    @if($cake->images)
+                        @php
+                            $images = json_decode($cake->images);
+                            $firstImage = is_array($images) && count($images) > 0 ? $images[0] : null;
+                        @endphp
+                        @if($firstImage)
+                            <img src="{{ asset('storage/'.$firstImage) }}" alt="{{ $cake->name }}" 
+                                 class="w-full h-64 object-cover">
+                        @else
+                            <img src="{{ asset('images/birthday.jpg') }}" alt="{{ $cake->name }}" 
+                                 class="w-full h-64 object-cover">
+                        @endif
+                    @else
+                        <img src="{{ asset('images/birthday.jpg') }}" alt="{{ $cake->name }}" 
+                             class="w-full h-64 object-cover">
+                    @endif
+                    
+                    @if($cake->stok < 5 && $cake->stok > 0)
+                        <div class="absolute top-3 left-3 bg-yellow-500 text-white text-xs px-2 py-1 rounded">LIMITED STOCK</div>
+                    @elseif($cake->stok >= 5)
+                        <div class="absolute top-3 left-3 bg-pink-primary text-white text-xs px-2 py-1 rounded">AVAILABLE</div>
+                    @else
+                        <div class="absolute top-3 left-3 bg-gray-500 text-white text-xs px-2 py-1 rounded">OUT OF STOCK</div>
+                    @endif
                 </div>
                 <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2">BIRTHDAY CAKE</h3>
-                    <p class="text-gray-600 mb-4">You've never tried a birthday cake like this. Our bestselling Birthday Cake, inspired by the...</p>
+                    <h3 class="text-xl font-semibold mb-2">{{ $cake->name }}</h3>
+                    <p class="text-gray-600 mb-2">{{ Str::limit($cake->description, 100) }}</p>
+                    <p class="text-gray-600 mb-4"><strong>Rasa:</strong> {{ $cake->flavor ?? 'Assorted' }}</p>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xl font-bold text-pink-primary">Rp {{ number_format($cake->price, 0, ',', '.') }}</span>
+                        <span class="text-sm text-gray-500">Stock: {{ $cake->stok }}</span>
+                    </div>
                     <div class="flex justify-center">
-                        <button class="w-full bg-black hover:bg-pink-primary text-white font-semibold py-3 px-4 rounded transition duration-200">
-                            Add to Cart - $62
+                        @if($cake->available && $cake->stok > 0)
+                        <form action="{{ route('carts.store') }}" method="POST" class="w-full">
+                            @csrf
+                            <input type="hidden" name="menu_id" value="{{ $cake->id }}">
+                            <button type="submit" class="w-full bg-black hover:bg-pink-primary text-white font-semibold py-3 px-4 rounded transition duration-200">
+                                Add to Cart
+                            </button>
+                        </form>
+                        @else
+                        <button disabled class="w-full bg-gray-400 text-white font-semibold py-3 px-4 rounded cursor-not-allowed">
+                            Out of Stock
                         </button>
+                        @endif
                     </div>
                 </div>
             </div>
-
-            <!-- Product 5 -->
-            <div class="bg-[#FFF6EA] rounded-lg overflow-hidden shadow-md">
-                <div class="relative">
-                    <img src="{{ asset('images/birthday.jpg') }}" alt="Strawberry Shortcake" 
-                         class="w-full h-64 object-cover">
-                    <div class="absolute top-3 left-3 bg-pink-primary text-white text-xs px-2 py-1 rounded">LIMITED TIME</div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2">STRAWBERRY SHORTCAKE CAKE</h3>
-                    <p class="text-gray-600 mb-4">Strawberry Shortcake but on a whole new level: vanilla cake layered with silky sweet cream...</p>
-                    <div class="flex justify-center">
-                        <button class="w-full bg-black hover:bg-pink-primary text-white font-semibold py-3 px-4 rounded transition duration-200">
-                            Add to Cart - $95
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 6 -->
-            <div class="bg-[#FFF6EA] rounded-lg overflow-hidden shadow-md">
-                <div class="relative">
-                    <img src="{{ asset('images/birthday.jpg') }}" alt="Gluten-Free Birthday Cake" 
-                         class="w-full h-64 object-cover">
-                    <div class="absolute top-3 left-3 bg-pink-primary text-white text-xs px-2 py-1 rounded">GLUTEN-FREE</div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2">GLUTEN-FREE BIRTHDAY CAKE</h3>
-                    <p class="text-gray-600 mb-4">Three tiers of rainbow-flecked, gluten-free vanilla B'Day cake layered with...</p>
-                    <div class="flex justify-center">
-                        <button class="w-full bg-black hover:bg-pink-primary text-white font-semibold py-3 px-4 rounded transition duration-200">
-                            Add to Cart - $78
-                        </button>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
+        @else
+        <div class="text-center py-12">
+            <p class="text-xl text-gray-500">No birthday cakes available at the moment.</p>
+        </div>
+        @endif
     </div>
 
     <!-- Shipping Banner -->
@@ -221,5 +171,38 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    sortCakes(this.value);
+                });
+            }
+
+            function sortCakes(sortType) {
+                const cakeContainer = document.querySelector('.grid');
+                const cakes = Array.from(document.querySelectorAll('.cake-item'));
+                
+                cakes.sort(function(a, b) {
+                    const priceA = parseFloat(a.getAttribute('data-price'));
+                    const priceB = parseFloat(b.getAttribute('data-price'));
+                    
+                    if (sortType === 'price-asc') {
+                        return priceA - priceB;
+                    } else if (sortType === 'price-desc') {
+                        return priceB - priceA;
+                    }
+                    return 0;
+                });
+                
+                cakeContainer.innerHTML = '';
+                cakes.forEach(function(cake) {
+                    cakeContainer.appendChild(cake);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
