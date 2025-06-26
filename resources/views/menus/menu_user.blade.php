@@ -13,14 +13,14 @@
 
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ffffff;
+    background-color:rgb(0, 0, 0);
     margin: 0;
     padding: 0;
   }
 
   /* Hero Section */
   .hero-section {
-    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80');
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80');
     background-size: cover;
     background-position: center;
     height: 400px;
@@ -50,6 +50,7 @@
     align-items: center;
     gap: 10px;
     font-size: 0.9rem;
+    margin:20px;
   }
 
   .breadcrumb-nav a {
@@ -63,7 +64,7 @@
 
   /* Main Content Container */
   .main-container {
-    max-width: 1200px;
+    max-width: 1250px;
     margin: 0 auto;
     padding: 0 20px;
   }
@@ -79,21 +80,17 @@
   }
 
   .search-container {
-    flex: 1;
-    max-width: 300px;
-    background: #111 !important;
-    border-radius: 8px;
-    padding: 10px 15px;
+    flex: 2;
   }
 
   .search-input {
     width: 100%;
     padding: 12px 20px;
-    border: 1px solid #333 !important;
+    border: 1px solid #222 !important;
     border-radius: 25px;
     font-size: 14px;
     outline: none;
-    background: #222 !important;
+    background: #111 !important;
     color: var(--bmd-pink) !important;
   }
 
@@ -119,7 +116,7 @@
 
   .sort-select {
     padding: 8px 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #222;
     border-radius: 5px;
     background: #111 !important;
     color: var(--bmd-pink) !important;
@@ -128,7 +125,7 @@
 
   .view-toggle {
     display: flex;
-    border: 1px solid #ddd;
+    border: 1px solid #222;
     border-radius: 5px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -202,6 +199,7 @@
     list-style: none;
     padding: 0;
     margin: 0;
+
   }
 
   .category-item {
@@ -209,9 +207,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #222;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: color 0.3s;  
   }
 
   .category-item,
@@ -276,7 +274,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #222;
     text-decoration: none;
     color: inherit;
     transition: all 0.3s ease;
@@ -462,7 +460,7 @@
     justify-content: space-between;
     align-items: center;
     padding-top: 10px;
-    border-top: 1px dashed #eee;
+    border-top: 1px dashed #222;
   }
   
   .product-card.list-view .product-badge {
@@ -760,17 +758,19 @@
   <div class="hero-content">
     <h1>Product</h1>
     <p>Discover our fresh bakery products</p>
-    <div class="breadcrumb-nav">
-      <a href="/">Home</a>
-      <span>></span>
-      <span>Product</span>
-    </div>
+    
   </div>
 </div>
 
 <div class="main-container">
+  <div class="breadcrumb-nav">
+      <a href="/">Home</a>
+      <span>></span>
+      <span>Product</span>
+    </div>
   <!-- Top Controls -->
   <div class="top-controls">
+    
     <div class="search-container">
       <input type="text" class="search-input" placeholder="Search..." id="searchInput">
     </div>
@@ -1008,7 +1008,7 @@ let carousels = {};
 
 // Global pagination variables
 let currentPage = 1;
-let itemsPerPage = 6;
+let itemsPerPage = 9;
 let totalPages = 1;
 
 // Initialize on page load

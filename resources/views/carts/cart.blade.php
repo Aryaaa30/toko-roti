@@ -1,445 +1,588 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    // Cari alamat yang paling sering digunakan di cart items
+    $cartAddresses = $carts->pluck('address')->filter();
+    $mostUsedAddress = $cartAddresses->count() > 0 ? $cartAddresses->first() : null;
+    $displayAddress = $mostUsedAddress ?? $defaultAddress;
+@endphp
+
 <style>
+    /* Leaflet CSS Override for dark theme */
+    .leaflet-container {
+        background: #111 !important;
+    }
+    
+    .leaflet-control-attribution {
+        background: rgba(0,0,0,0.8) !important;
+        color: #888 !important;
+    }
+    
+    .leaflet-control-attribution a {
+        color: #fec6e4 !important;
+    }
+
+    /* General Styles with Dark Mode Palette */
     body {
-        background-color: #f5f5f5;
-        font-family: 'Segoe UI', sans-serif;
+        --bg-dark: rgb(10, 10, 10);
+        --card-bg: rgb(18, 18, 18);
+        --border-color: rgb(40, 40, 40);
+        --text-base: rgb(245, 245, 245);
+        --text-important: rgb(254, 198, 228); /* Pastel Pink */
+        --text-secondary: #b0b0b0;
+        --text-white: #ffffff;
+
+        background-color: black;
+        font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        color: var(--text-base);
     }
 
-    .container {
+    .cart-container {
+        max-width: 1220px;
+        margin: 40px auto;
+        padding: 25px;
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+
+    /* Cart Header */
+    .cart-header {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .cart-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-base);
+    }
+
+    .cart-header .continue-shopping {
+        text-decoration: none;
+        color: var(--text-secondary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: color 0.2s;
+    }
+    .cart-header .continue-shopping:hover {
+        color: var(--text-base);
+    }
+
+    /* Cart Table */
+    .cart-table-header {
+        display: grid;
+        grid-template-columns: 3fr 2fr 1fr 1fr 0.5fr;
         gap: 20px;
-        max-width: 1200px;
-        margin: 30px auto;
+        padding: 0 15px;
+        margin-bottom: 10px;
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
     }
 
-    .left-column {
-        flex: 2;
+    /* Cart Item */
+    .cart-item {
+        display: grid;
+        grid-template-columns: 3fr 2fr 1fr 1fr 0.5fr;
+        gap: 20px;
+        align-items: center;
+        padding: 20px 15px;
+        border-bottom: 1px solid var(--border-color);
     }
 
-    .right-column {
-        flex: 1;
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        height: fit-content;
-        position: sticky;
-        top: 30px;
-    }
-
-    .card {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        margin-bottom: 15px;
+    .item-product {
         display: flex;
+        align-items: center;
         gap: 15px;
-        position: relative;
-        padding: 10px;
     }
 
-    .card-img {
-        width: 100px;
-        height: 100px;
+    .item-product img {
+        width: 80px;
+        height: 80px;
         border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .card-img img {
-        width: 100%;
-        height: 100%;
         object-fit: cover;
     }
 
-    .card-body {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .card-title {
+    .product-details .product-name {
+        font-weight: 700;
         font-size: 16px;
-        font-weight: bold;
-        color: #2c3e50;
-    }
-
-    .card-text {
-        font-size: 14px;
-        color: #7f8c8d;
         margin-bottom: 4px;
+        color: var(--text-base);
     }
 
-    .card-price {
-        font-weight: bold;
-        color: #e67e22;
-        margin-top: 8px;
+    .product-details .product-info {
+        font-size: 12px;
+        color: var(--text-secondary);
     }
 
-    .quantity-form {
+    .item-price .base-price {
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--text-base);
+    }
+
+    .item-price .extra-info {
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+    
+    .item-qty {
         display: flex;
         align-items: center;
-        margin-top: 8px;
+        justify-content: center;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        width: 100px;
     }
 
-    .quantity-control {
-        display: flex;
-        align-items: center;
-        border: 1px solid #c4c9d9;
-        border-radius: 4px;
-        overflow: hidden;
-        width: 90px;
-        height: 30px;
-    }
-
-    .quantity-control button {
+    .item-qty button {
         border: none;
         background: none;
-        font-size: 16px;
-        color: #e67e22;
-        font-weight: 700;
-        width: 28px;
-        height: 30px;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-base);
         cursor: pointer;
-        user-select: none;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        padding: 8px 12px;
+    }
+    
+    .item-qty button:disabled {
+        color: #555;
     }
 
-    .quantity-control button:disabled {
-        color: #ccc;
-        cursor: default;
-    }
-
-    .quantity-control input {
-        width: 34px;
-        height: 30px;
+    .item-qty .quantity-input {
+        width: 30px;
         border: none;
         text-align: center;
-        font-size: 14px;
-        font-weight: 600;
-        color: #222;
+        font-weight: 700;
+        font-size: 16px;
+        background: transparent;
         outline: none;
-        user-select: none;
+        color: var(--text-base);
+    }
+    
+    .item-total {
+        font-weight: 700;
+        font-size: 16px;
+        text-align: right;
+        color: var(--text-important);
     }
 
-    .btn-sm {
-        background-color: #e74c3c;
-        color: #fff;
+    .item-remove button {
         border: none;
-        padding: 4px 8px;
-        border-radius: 4px;
-        margin-top: 8px;
+        background: none;
+        font-size: 20px;
+        color: var(--text-secondary);
         cursor: pointer;
+        padding: 5px;
+        line-height: 1;
+    }
+    .item-remove button:hover {
+        color: #e74c3c;
+    }
+    
+    /* Cart Footer */
+    .cart-footer {
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
     }
 
-    .select-all-wrapper {
+    .shipping-mode h3 {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+    .shipping-option {
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 15px;
+    }
+    
+    .shipping-option input[type="radio"] {
+       accent-color: var(--text-important);
+       transform: scale(1.3);
+       background-color: var(--bg-dark); /* For non-supporting browsers */
+       pointer-events: none; /* The whole div is not clickable, so no need for pointer */
+    }
+    
+    .shipping-option.selected {
+        border-color: var(--text-important);
+        background-color: rgba(254, 198, 228, 0.07);
+    }
+
+    .shipping-info .label {
+        font-weight: 600;
+        color: var(--text-base);
+    }
+    
+    .shipping-info .description {
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    
+    .shipping-cost {
+        margin-left: auto;
+        font-weight: 700;
+        color: var(--text-base);
+    }
+
+    .summary {
+        background-color: var(--bg-dark);
+        padding: 25px;
+        border-radius: 8px;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
         margin-bottom: 15px;
-        background-color: #fff;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    }
-
-    .total-display {
         font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 10px;
+        color: var(--text-secondary);
     }
-
-    .btn-checkout {
-        width: 100%;
-        background-color: #27ae60;
-        color: #fff;
-        padding: 10px;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
+    .summary-item span:last-child {
+        color: var(--text-base);
+        font-weight: 600;
+    }
+    
+    .summary-item.total {
+        color: var(--text-base);
+        font-weight: 700;
+        font-size: 18px;
+        border-top: 1px solid var(--border-color);
+        padding-top: 15px;
         margin-top: 10px;
     }
+    .summary-item.total span:last-child {
+        color: var(--text-important);
+    }
+    
+    .btn-checkout {
+        width: 100%;
+        background-color: var(--text-important);
+        color: var(--bg-dark);
+        border: none;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-checkout:hover {
+        background-color: rgb(255, 215, 235);
+    }
 
-    .alert {
-        background-color: #d4edda;
-        color: #155724;
-        padding: 10px;
-        border-radius: 6px;
-        margin-bottom: 15px;
-        max-width: 1200px;
-        margin: 0 auto 15px;
+    .btn-checkout:disabled {
+        background-color: #444;
+        color: #888;
+        cursor: not-allowed;
     }
 
     .empty-message {
         text-align: center;
-        padding: 50px 20px;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        max-width: 600px;
-        margin: 30px auto;
+        padding: 60px 20px;
     }
 
+    .empty-message p {
+        font-size: 18px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+    }
+    
     .btn-primary {
-        background-color: #e67e22;
-        color: white;
-        padding: 10px 20px;
+        background-color: var(--text-important);
+        color: var(--bg-dark);
+        padding: 12px 25px;
         text-decoration: none;
         border-radius: 6px;
-        display: inline-block;
-        margin-top: 10px;
+        font-weight: 600;
+        transition: background-color 0.2s;
     }
-
     .btn-primary:hover {
-        background-color: #d35400;
-    }
-
-    .card input[type="checkbox"] {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-    }
-    
-    .header-area {
-        text-align: center;
-        padding: 30px 0 10px;
-    }
-    
-    .header-area h1 {
-        font-size: 28px;
-        font-weight: 700;
-        color: #2c3e50;
-    }
-    
-    .badge-status {
-        display: inline-block;
-        padding: 3px 6px;
-        border-radius: 4px;
-        font-size: 10px;
-        font-weight: bold;
-        margin-bottom: 4px;
-    }
-
-    .badge-available {
-        background-color: #2ecc71;
-        color: white;
-    }
-
-    .badge-unavailable {
-        background-color: #e74c3c;
-        color: white;
-    }
-    
-    @media (max-width: 768px) {
-        .container {
-            flex-direction: column;
-        }
-        
-        .right-column {
-            position: static;
-        }
+        background-color: rgb(255, 215, 235);
     }
 </style>
 
-<div class="header-area">
-    <h1>Keranjang Belanja</h1>
-</div>
-
-@if(session('success'))
-    <div class="alert">{{ session('success') }}</div>
-@endif
-
-@if($carts->count() > 0)
-<div class="container">
-    <div class="left-column">
-        <div class="select-all-wrapper">
-            <input type="checkbox" id="select-all"> <label for="select-all">Pilih Semua</label>
+<div class="cart-container">
+    @if($carts->count() > 0)
+        <div class="cart-header">
+            <h1>My Cart</h1>
+            <a href="{{ route('menus.index') }}" class="continue-shopping">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                </svg>
+                Continue shopping
+            </a>
         </div>
 
-        @foreach($carts as $cart)
-        <div class="card" data-id="{{ $cart->id }}">
-            <input type="checkbox" class="product-checkbox" data-total="{{ ($cart->menu->price ?? 0) * $cart->quantity }}">
+        <div class="cart-table-header">
+            <div>Product</div>
+            <div>Price</div>
+            <div style="text-align:center;">Qty</div>
+            <div style="text-align:right;">Total</div>
+            <div></div>
+        </div>
 
-            <div class="card-img">
-                @if($cart->menu && $cart->menu->images)
+        <div id="cart-items-wrapper">
+            @foreach($carts as $cart)
+            <div class="cart-item" data-id="{{ $cart->id }}" data-price="{{ $cart->menu->price ?? 0 }}" data-stock="{{ $cart->menu->stok ?? 1 }}">
+                <div class="item-product">
                     @php
-                        $images = json_decode($cart->menu->images);
-                        $firstImage = is_array($images) && count($images) > 0 ? $images[0] : null;
+                        $img = null;
+                        if ($cart->menu && $cart->menu->images) {
+                            $imgs = json_decode($cart->menu->images, true);
+                            if (is_array($imgs) && count($imgs) > 0) {
+                                $img = asset('storage/' . $imgs[0]);
+                            }
+                        }
+                        if (!$img && $cart->menu && $cart->menu->image) {
+                            $img = asset('storage/' . $cart->menu->image);
+                        }
                     @endphp
-                    @if($firstImage)
-                        <img src="{{ asset('storage/'.$firstImage) }}" alt="{{ $cart->menu->name }}">
-                    @else
-                        <img src="https://via.placeholder.com/100" alt="No image">
-                    @endif
-                @elseif($cart->menu && $cart->menu->image)
-                    <img src="{{ asset('storage/'.$cart->menu->image) }}" alt="{{ $cart->menu->name }}">
-                @else
-                    <img src="https://via.placeholder.com/100" alt="No image">
-                @endif
-            </div>
-
-            <div class="card-body">
-                <div class="card-title">{{ $cart->menu->name ?? 'Produk tidak ditemukan' }}</div>
-                
-                @if($cart->menu && isset($cart->menu->available))
-                    <span class="badge-status {{ $cart->menu->available ? 'badge-available' : 'badge-unavailable' }}">
-                        {{ $cart->menu->available ? 'Tersedia' : 'Tidak Tersedia' }}
-                    </span>
-                @endif
-                
-                <div class="card-text"><strong>Kategori:</strong> {{ $cart->menu->kategori ?? '-' }}</div>
-                <div class="card-text">{{ Str::limit($cart->menu->description ?? '-', 100) }}</div>
-                <div class="card-text"><strong>Stok:</strong> {{ $cart->menu->stok ?? 0 }} pcs</div>
-                <div class="card-price">Rp {{ number_format($cart->menu->price ?? 0, 0, ',', '.') }}</div>
-
-                <div class="quantity-form">
-                    <div class="quantity-control">
-                        <button type="button" class="decrease-btn" onclick="updateQuantity(this, -1)">-</button>
-                        <input type="text" name="quantity" value="{{ $cart->quantity }}" min="1" max="{{ $cart->menu->stok ?? 1 }}" class="quantity-input" data-price="{{ $cart->menu->price ?? 0 }}" readonly>
-                        <button type="button" class="increase-btn" onclick="updateQuantity(this, 1)">+</button>
+                    <img src="{{ $img ?? 'https://via.placeholder.com/80' }}" alt="{{ $cart->menu->name }}">
+                    <div class="product-details">
+                        <div class="product-name">{{ $cart->menu->name ?? 'Produk tidak ditemukan' }}</div>
+                        <div class="product-info">Kategori: {{ $cart->menu->kategori ?? '-' }}</div>
+                        @if($cart->notes)
+                          <div class="product-info" style="color:#fec6e4; font-size:13px; margin-top:2px;">Catatan: {{ $cart->notes }}</div>
+                        @endif
                     </div>
                 </div>
-
-                <div class="card-price">
-                    Total: Rp <span class="total-price">{{ number_format(($cart->menu->price ?? 0) * $cart->quantity, 0, ',', '.') }}</span>
+                <div class="item-price">
+                    <div class="base-price">Rp {{ number_format($cart->menu->price ?? 0, 0, ',', '.') }}</div>
+                    <div class="extra-info">Harga per item</div>
                 </div>
+                <div class="item-qty">
+                    <button type="button" class="decrease-btn" onclick="updateQuantity(this, -1)">-</button>
+                    <input type="text" value="{{ $cart->quantity }}" class="quantity-input" readonly>
+                    <button type="button" class="increase-btn" onclick="updateQuantity(this, 1)">+</button>
+                </div>
+                <div class="item-total">
+                    Rp <span class="line-total-price">{{ number_format(($cart->menu->price ?? 0) * $cart->quantity, 0, ',', '.') }}</span>
+                </div>
+                <div class="item-remove">
+                    <form action="{{ route('carts.destroy', $cart->id) }}" method="POST" onsubmit="return confirm('Hapus item ini dari keranjang?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit">&times;</button>
+                    </form>
+                </div>
+            </div>
+            @endforeach
+        </div>
 
-                <form action="{{ route('carts.destroy', $cart->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus item ini?');">
+        <div class="cart-footer">
+            <div class="shipping-mode">
+                <h3>Shipping Method</h3>
+                <div class="shipping-option selected">
+                    <input type="radio" id="shipping-delivery" name="shipping" value="0" data-cost="0" checked>
+                    <div class="shipping-info">
+                        <div class="label">Delivery at home</div>
+                        @if(isset($addresses) && count($addresses) > 0)
+                          <label for="address-select" style="font-size:14px; color:#fec6e4; font-weight:600; margin-top:8px; display:block;">Pilih Alamat Pengiriman:</label>
+                          <div class="description" id="address-detail-box" style="cursor:pointer; position:relative;"></div>
+                          <div id="address-dropdown-list" style="display:none; position:absolute; z-index:10; background:#222; border:1px solid #fec6e4; border-radius:6px; min-width:260px; max-width:400px; box-shadow:0 2px 8px #0008;"></div>
+                        @else
+                          <div style="color: #ef4444; font-size: 14px; margin-bottom: 8px;">Anda belum memiliki alamat pengiriman.</div>
+                        @endif
+                    </div>
+                    <div class="shipping-cost">FREE</div>
+                </div>
+            </div>
+
+            <div class="summary">
+                <div class="summary-item">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">Rp 0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Shipping</span>
+                    <span id="summary-shipping">Rp 0</span>
+                </div>
+                <div class="summary-item total">
+                    <span>TOTAL</span>
+                    <span id="summary-total">Rp 0</span>
+                </div>
+                
+                <form action="{{ route('orders.store') }}" method="POST" id="checkout-form">
                     @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn-sm">Hapus</button>
+                    <input type="hidden" name="selected_items" id="selected-items" value="">
+                    <input type="hidden" name="shipping_cost" id="shipping-cost-input" value="0">
+                    <button type="submit" class="btn-checkout" id="checkout-btn">
+                        <span>Checkout!</span>
+                        <span id="checkout-total">Rp 0</span>
+                    </button>
                 </form>
             </div>
-        </div>
-        @endforeach
-    </div>
+        </div>  
 
-    <div class="right-column">
-        <div class="total-display">Total: Rp <span id="total-amount">0</span></div>
-        <form action="{{ route('orders.store') }}" method="POST" id="checkout-form">
-            @csrf
-            <input type="hidden" name="selected_items" id="selected-items" value="">
-            <button type="submit" class="btn-checkout" id="checkout-btn">Checkout</button>
-        </form>
-    </div>
+    @else
+        <div class="empty-message">
+            <p>Keranjang belanja Anda kosong.</p>
+            <a href="{{ route('menus.index') }}" class="btn-primary">Belanja Sekarang</a>
+        </div>
+    @endif
 </div>
-@else
-    <div class="empty-message">
-        <p>Keranjang belanja kosong.</p>
-        <a href="{{ route('menus.index') }}" class="btn-primary">Belanja Sekarang</a>
-    </div>
-@endif
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize quantity buttons state
-        document.querySelectorAll('.quantity-control').forEach(control => {
-            const input = control.querySelector('.quantity-input');
-            const decreaseBtn = control.querySelector('.decrease-btn');
-            const increaseBtn = control.querySelector('.increase-btn');
-            const currentQty = parseInt(input.value);
-            const maxQty = parseInt(input.getAttribute('max'));
-            
-            decreaseBtn.disabled = currentQty <= 1;
-            increaseBtn.disabled = currentQty >= maxQty;
-        });
-        
-        // Secara default pilih semua checkbox
-        document.getElementById('select-all').checked = true;
-        document.querySelectorAll('.product-checkbox').forEach(cb => {
-            cb.checked = true;
-        });
-        
-        // Update total on page load
-        updateTotal();
+// Data alamat untuk JS
+const addresses = @json($addresses);
+
+function renderAddressDetail(addressId) {
+  const address = addresses.find(a => a.id == addressId);
+  const box = document.getElementById('address-detail-box');
+  if (!address || !box) return;
+  let html = '';
+  html += `<strong>${address.label}${address.is_default ? ' (Utama)' : ''}</strong><br>`;
+  html += `${address.address_line_1 || ''}${address.address_line_2 ? ', ' + address.address_line_2 : ''}`;
+  if (address.city || address.state || address.postal_code || address.country) {
+    html += `<br>${[address.city, address.state, address.postal_code, address.country].filter(Boolean).join(', ')}`;
+  }
+  html += ' <span style="font-size:13px; color:#fec6e4; margin-left:8px; cursor:pointer;">&#9660;</span>';
+  box.innerHTML = html;
+}
+
+function showAddressDropdown() {
+  const box = document.getElementById('address-detail-box');
+  const dropdown = document.getElementById('address-dropdown-list');
+  if (!box || !dropdown) return;
+  let html = '';
+  addresses.forEach(address => {
+    html += `<div class="address-option" data-id="${address.id}" style="padding:10px 16px; cursor:pointer; color:#fff;${address.is_default ? ' font-weight:600;' : ''}">
+      <div><strong>${address.label}${address.is_default ? ' (Utama)' : ''}</strong></div>
+      <div style=\"font-size:13px; color:#bbb;\">${address.address_line_1 || ''}${address.address_line_2 ? ', ' + address.address_line_2 : ''}</div>
+    </div>`;
+  });
+  dropdown.innerHTML = html;
+  const rect = box.getBoundingClientRect();
+  dropdown.style.display = 'block';
+  dropdown.style.left = box.offsetLeft + 'px';
+  dropdown.style.top = (box.offsetTop + box.offsetHeight + 4) + 'px';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  let selectedId = addresses[0] ? addresses[0].id : null;
+  if (selectedId) renderAddressDetail(selectedId);
+  // Ganti event pada box
+  const box = document.getElementById('address-detail-box');
+  const dropdown = document.getElementById('address-dropdown-list');
+  if (box && dropdown) {
+    box.addEventListener('click', function(e) {
+      showAddressDropdown();
     });
-
-    function updateQuantity(button, change) {
-        const control = button.closest('.quantity-control');
-        const input = control.querySelector('.quantity-input');
-        const decreaseBtn = control.querySelector('.decrease-btn');
-        const increaseBtn = control.querySelector('.increase-btn');
-        
-        let currentQty = parseInt(input.value);
-        const maxQty = parseInt(input.getAttribute('max'));
-        const price = parseInt(input.dataset.price);
-        
-        let newQty = currentQty + change;
-        if (newQty < 1) newQty = 1;
-        if (newQty > maxQty) newQty = maxQty;
-        
-        input.value = newQty;
-        
-        // Update buttons state
-        decreaseBtn.disabled = newQty <= 1;
-        increaseBtn.disabled = newQty >= maxQty;
-        
-        // Update item total
-        const card = button.closest('.card');
-        const cartId = card.dataset.id;
-        const checkbox = card.querySelector('.product-checkbox');
-        
-        // Update via AJAX
-        fetch(`/carts/${cartId}/quantity`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ quantity: newQty })
-        })
-        .then(res => res.json())
-        .then(data => {
-            const totalPerItem = data.total;
-            const totalElement = card.querySelector('.total-price');
-            checkbox.dataset.total = totalPerItem;
-            totalElement.textContent = totalPerItem.toLocaleString('id-ID');
-            updateTotal();
-        })
-        .catch(error => {
-            console.error('Error updating quantity:', error);
-        });
-    }
-
-    function updateTotal() {
-        let total = 0;
-        const selectedItems = [];
-        
-        document.querySelectorAll('.product-checkbox:checked').forEach(cb => {
-            const cartId = cb.closest('.card').dataset.id;
-            total += parseInt(cb.dataset.total || 0);
-            selectedItems.push(cartId);
-        });
-        
-        document.getElementById('total-amount').textContent = total.toLocaleString('id-ID');
-        document.getElementById('selected-items').value = selectedItems.join(',');
-        
-        // Disable checkout button if no items selected
-        document.getElementById('checkout-btn').disabled = selectedItems.length === 0;
-    }
-
-    document.querySelectorAll('.product-checkbox').forEach(cb => {
-        cb.addEventListener('change', updateTotal);
+    dropdown.addEventListener('click', function(e) {
+      const opt = e.target.closest('.address-option');
+      if (opt) {
+        selectedId = opt.dataset.id;
+        renderAddressDetail(selectedId);
+        dropdown.style.display = 'none';
+        // Update hidden input jika ada
+        const checkoutAddressInput = document.getElementById('checkout-address-id');
+        if (checkoutAddressInput) checkoutAddressInput.value = selectedId;
+      }
     });
+    document.addEventListener('click', function(e) {
+      if (!box.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
+  }
+  updateSummary();
+});
 
-    document.getElementById('select-all').addEventListener('change', function () {
-        const checked = this.checked;
-        document.querySelectorAll('.product-checkbox').forEach(cb => {
-            cb.checked = checked;
-        });
-        updateTotal();
+function updateQuantity(button, change) {
+    const itemElement = button.closest('.cart-item');
+    const input = itemElement.querySelector('.quantity-input');
+    
+    let currentQty = parseInt(input.value);
+    const maxQty = parseInt(itemElement.dataset.stock);
+    
+    let newQty = currentQty + change;
+    if (newQty < 1) newQty = 1;
+    if (newQty > maxQty) newQty = maxQty;
+    
+    input.value = newQty;
+
+    // Update via AJAX
+    const cartId = itemElement.dataset.id;
+    fetch(`/carts/${cartId}/quantity`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ quantity: newQty })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const price = parseFloat(itemElement.dataset.price);
+        const lineTotal = newQty * price;
+        itemElement.querySelector('.line-total-price').textContent = lineTotal.toLocaleString('id-ID', { minimumFractionDigits: 0 });
+        updateSummary();
+    })
+    .catch(error => {
+        console.error('Error updating quantity:', error);
+    });
+}
+
+function updateSummary() {
+    let subtotal = 0;
+    const allCartItems = [];
+
+    document.querySelectorAll('.cart-item').forEach(item => {
+        const price = parseFloat(item.dataset.price);
+        const quantity = parseInt(item.querySelector('.quantity-input').value);
+        subtotal += price * quantity;
+        allCartItems.push(item.dataset.id);
     });
     
-    document.getElementById('checkout-form').addEventListener('submit', function(e) {
-        const selectedItems = document.getElementById('selected-items').value;
-        if (!selectedItems) {
-            e.preventDefault();
-            alert('Silakan pilih produk yang ingin dibeli terlebih dahulu.');
-        }
-    });
+    const shippingRadio = document.querySelector('input[name="shipping"]:checked');
+    const shippingCost = shippingRadio ? parseFloat(shippingRadio.value) : 0;
+    const total = subtotal + shippingCost;
+    
+    // Update summary display
+    document.getElementById('summary-subtotal').textContent = 'Rp ' + subtotal.toLocaleString('id-ID', { minimumFractionDigits: 0 });
+    document.getElementById('summary-shipping').textContent = shippingCost > 0 ? 'Rp ' + shippingCost.toLocaleString('id-ID', { minimumFractionDigits: 0 }) : 'FREE';
+    document.getElementById('summary-total').textContent = 'Rp ' + total.toLocaleString('id-ID', { minimumFractionDigits: 0 });
+
+    // Update checkout button
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.disabled = allCartItems.length === 0;
+        checkoutBtn.querySelector('span:last-child').textContent = 'Rp ' + total.toLocaleString('id-ID', { minimumFractionDigits: 0 });
+    }
+
+    // Update hidden inputs
+    document.getElementById('selected-items').value = allCartItems.join(',');
+    document.getElementById('shipping-cost-input').value = shippingCost;
+}
+
+// Leaflet JS for shipping map
+if (typeof L !== 'undefined') {
+    initShippingMap();
+}
 </script>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1jRVv6Gk6GkG6lLrj5lZQ+1Q9Q4p1gXkG4QmQf3s=" crossorigin=""></script>
 @endsection

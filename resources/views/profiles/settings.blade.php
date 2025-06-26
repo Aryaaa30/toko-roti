@@ -8,720 +8,729 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Account Settings</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <style>
+  /* --- Color & Theme Variables --- */
+  :root {
+    --bg-dark: rgb(10, 10, 10);
+    --card-bg: rgb(10, 10, 10);
+    --border-color: rgb(40, 40, 40);
+    
+    /* Your Custom Color Palette */
+    --text-base: rgb(245, 245, 245);          /* Base text color */
+    --text-important: rgb(254, 198, 228);   /* Important/accent text color (Pastel Pink) */
+    --text-secondary: #b0b0b0;               /* Secondary, less prominent text */
+    --text-white: #ffffff;
+  }
+
+  /* --- General Resets & Dark Theme Foundation --- */
   * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
   body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background-color: #f7f1ea;
-    color: #222222;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-base);
+    padding-top: 2rem;
   }
+  
+  /* --- Main Layout Container --- */
   .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px 60px 20px;
+
+    margin: 2rem auto;
+    padding: 0 20px;
     display: flex;
     gap: 40px;
+    align-items: flex-start;
   }
+  
+  /* --- Sidebar Styling --- */
   .sidebar {
-    background: #fff;
-    border-radius: 10px;
-    padding: 30px 30px 40px 30px;
-    width: 320px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    flex: 0 0 340px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    position: sticky;
+    top: 2rem;
   }
-  .sidebar-top {
-    user-select: none;
-  }
+
   .sidebar-top p {
-    margin: 0 0 10px 0;
-    font-weight: 400;
+    margin-bottom: 1rem;
+    font-weight: 500;
     font-size: 16px;
+    color: var(--text-secondary);
   }
   .sidebar-top h1 {
-    margin: 0 0 30px 0;
-    font-weight: 900;
-    font-size: 40px;
-    letter-spacing: 0.02em;
-  }
-  .sidebar-top nav a {
-    display: block;
-    font-weight: 400;
-    font-size: 18px;
-    color: #222222;
-    text-decoration: none;
-    margin-bottom: 30px;
-    line-height: 1.3;
-  }
-  .sidebar-top nav a:last-child {
-    margin-bottom: 0;
-  }
-  .sidebar-top nav a.active,
-  .sidebar-top nav a:hover {
-    text-decoration: underline;
-  }
-  .sidebar-bottom {
+    margin-bottom: 2rem;
     font-weight: 700;
-    font-size: 16px;
-    display: flex;
-    gap: 30px;
-    user-select: none;
+    font-size: 32px;
+    line-height: 1.2;
+    color: var(--text-important);
   }
-  .sidebar-bottom strong {
-    cursor: default;
-  }
-  .sidebar-bottom a {
-    color: #222222;
-    text-decoration: none;
-    font-weight: 700;
-  }
-  .sidebar-bottom a:hover {
-    text-decoration: underline;
-  }
-  .main-content {
-    flex: 1;
-  }
-  .main-content h2 {
-    font-weight: 900;
-    font-size: 24px;
-    margin: 0 0 30px 0;
-    user-select: none;
-  }
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-    gap: 30px;
-  }
-  .card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 25px 30px 30px 30px;
+  
+  /* --- Navigation Links --- */
+  .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 1.5rem;
+    font-weight: 500;
+    font-size: 18px;
+  }
+  .sidebar-nav a {
+    color: var(--text-base);
+    text-decoration: none;
+    transition: color 0.3s ease, padding-left 0.3s ease, border-color 0.3s ease;
+    padding-left: 0;
+    border-left: 3px solid transparent;
+  }
+  .sidebar-nav a:hover {
+    color: var(--text-white);
+  }
+  .sidebar-nav a.active {
+    color: var(--text-important);
+    font-weight: 700;
+    padding-left: 15px;
+    border-left: 3px solid var(--text-important);
+  }
+  
+  /* --- Sidebar Footer --- */
+  .sidebar-bottom {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .sidebar-bottom a, .sidebar-bottom button {
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+    text-decoration: none;
+    text-align: left;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .sidebar-bottom a:hover, .sidebar-bottom button:hover {
+    color: var(--text-white);
+  }
+
+  /* --- Profile Image Styling --- */
+  .profile-image-container {
+    position: relative;
+    width: 120px;
+    margin: -100px auto 25px auto;
+  }
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--border-color);
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .profile-image:hover {
+    border-color: var(--text-important);
+    transform: scale(1.05);
+  }
+  .profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .placeholder-icon {
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--text-secondary);
+  }
+  .edit-profile-btn {
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #2a2a2a;
+    color: var(--text-white);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+  }
+  .edit-profile-btn:hover {
+    background-color: var(--text-important) !important;
+    color: var(--bg-dark) !important;
+    transform: translateX(-50%) translateY(-2px) !important;
+  }
+
+  /* --- Main Content Area --- */
+  .main-content {
+    flex: 1.5 1 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  /* --- Card Styling --- */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px 35px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
   }
   .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #222222;
-    padding-bottom: 8px;
-    font-weight: 400;
-    font-size: 16px;
-    user-select: none;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
   }
   .card-header .edit {
-    font-weight: 700;
-    font-size: 14px;
     cursor: pointer;
-    user-select: none;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-base);
+    text-decoration: none;
+    transition: color 0.3s ease;
   }
   .card-header .edit:hover {
-    text-decoration: underline;
+    color: var(--text-white);
   }
-  .profile-info,
-  .password-info,
-  .saved-address,
-  .communication-info {
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 1.5;
-  }
-  .profile-info .row,
-  .communication-info .row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  .profile-info .row label,
-  .communication-info .row label {
-    user-select: none;
-  }
-  .saved-address .address-row {
-    background: #fef9f5;
-    border-radius: 10px;
-    padding: 12px 20px;
-    font-weight: 400;
-    font-size: 16px;
+  
+  /* --- Info Styling (in cards) --- */
+  .info-group .row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
+    font-size: 16px;
   }
-  .saved-address .address-row .edit {
+  .info-group .row:last-child {
+    margin-bottom: 0;
+  }
+  .info-group .row .label, .sub-header .label {
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .info-group .row .value {
+    font-weight: 500;
+    color: var(--text-base);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+   .info-group .row .value .fas.fa-lock {
+    color: var(--text-secondary);
+   }
+   .sub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-weight: 700;
     font-size: 16px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .saved-address .address-row .edit:hover {
-    text-decoration: underline;
-  }
-  @media (max-width: 768px) {
+    color: var(--text-base);
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+   }
+
+  /* --- Modal Styling --- */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+        z-index: 9999;
+    }
+    .modal {
+        background: var(--bg-dark);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        width: 90%;
+        max-width: 480px;
+        padding: 32px 32px 40px 32px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+        position: relative;
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+    .modal-header h2 {
+        font-weight: 700;
+        font-size: 22px;
+        color: var(--text-base);
+        margin: 0;
+    }
+    .close-btn {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    .close-btn:hover {
+        color: var(--text-white);
+    }
+
+    /* --- Form Styling --- */
+    form label {
+        display: block;
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: var(--text-secondary);
+    }
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="date"],
+    form input[type="password"] {
+        width: 100%;
+        height: 48px;
+        padding: 12px 16px;
+        font-size: 16px;
+        border: 1.5px solid var(--border-color);
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        color: var(--text-base);
+        font-family: 'Inter', sans-serif;
+    }
+    form input:focus {
+        outline: none;
+        border-color: var(--text-important);
+    }
+    form input[readonly] {
+        background-color: #1a1a1a;
+        cursor: not-allowed;
+    }
+    .email-container {
+        position: relative;
+        width: 100%;
+    }
+    .email-container .email-lock-icon {
+        position: absolute;
+        right: 16px;
+        top: 15px;
+        color: var(--text-secondary);
+    }
+    .info-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: -10px;
+        margin-bottom: 1rem;
+    }
+    .save-btn {
+        width: 100%;
+        height: 48px;
+        background: var(--text-important);
+        color: var(--bg-dark);
+        border-radius: 8px;
+        border: none;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: background-color 0.3s;
+    }
+    .save-btn:hover {
+        background-color: rgb(255, 215, 235);
+    }
+    .cancel-text {
+        text-align: center;
+        font-size: 14px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        user-select: none;
+        margin-top: 1rem;
+    }
+
+    /* --- Toast Notification --- */
+    #toast {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #222;
+        border: 1px solid var(--border-color);
+        color: #fff;
+        text-align: center;
+        border-radius: 8px;
+        padding: 16px;
+        position: fixed;
+        left: 50%;
+        bottom: 30px;
+        font-size: 16px;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.5s, visibility 0.5s, bottom 0.5s;
+    }
+
+  /* --- Responsive Adjustments --- */
+  @media (max-width: 900px) {
     .container {
       flex-direction: column;
-      padding: 20px 15px 40px 15px;
+      margin: 1rem auto;
+      gap: 30px;
     }
     .sidebar {
+      position: static;
       width: 100%;
-      margin-bottom: 30px;
-      padding: 25px 20px 30px 20px;
-    }
-    .cards {
-      grid-template-columns: 1fr;
-      gap: 20px;
     }
   }
-
-  .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none; /* awalnya disembunyikan */
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
-}
-
-.modal {
-  background: #fff;
-  border-radius: 10px;
-  padding: 30px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.25);
-  position: relative;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-header h1 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-form label {
-  font-weight: 600;
-  margin-top: 10px;
-}
-
-form input,
-form select {
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-form .email-container {
- position: relative;
-  width: 100%;
-}
-
-.email-container input {
-  width: 100%;
-  padding-right: 35px; /* Space for the lock icon */
-}
-
-form .email-lock-icon {
-   position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #888;
-  pointer-events: none;
-}
-
-form .info-text {
-  font-size: 12px;
-  color: #888;
-}
-
-.save-btn {
-  margin-top: 20px;
-  padding: 10px;
-  font-size: 16px;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.save-btn:hover {
-  background: #444;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none; /* default hidden */
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
-}
-
-.modal {
-  background: #fff;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 480px;
-  padding: 32px 32px 40px 32px;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
-  position: relative;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.modal-header h2 {
-  font-weight: 700;
-  font-size: 22px;
-  color: #222;
-  margin: 0;
-}
-
-.close-btn {
-  font-size: 28px;
-  font-weight: 700;
-  color: #222;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-form label {
-  display: block;
-  font-weight: 400;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-form input[type="password"] {
-  width: 100%;
-  height: 48px;
-  padding: 12px 16px;
-  font-size: 16px;
-  border: 1.5px solid #000;
-  border-radius: 8px;
-  margin-bottom: 24px;
-}
-
-form input::placeholder {
-  color: #222;
-}
-
-button.save-btn {
-  width: 100%;
-  height: 48px;
-  background: #1a1717;
-  color: #f7e6d6;
-  border-radius: 6px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.cancel-text {
-  text-align: center;
-  font-size: 14px;
-  color: #222;
-  cursor: pointer;
-  user-select: none;
-}
- .profile-image {
-  width: 120px;
-  height: 120px;
-  margin: -130px auto 15px auto;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid #1a1a1a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ddd;
-  font-size: 48px;
-  color: #1a1a1a;
-}
-
-.profile-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.placeholder-icon {
-  font-size: 48px;
-  font-weight: bold;
-  color: #1a1a1a;
-}
 
 </style>
 </head>
 <body>
   <div class="container">
-    <aside class="sidebar">
+    <aside class="sidebar" role="complementary" aria-label="User account navigation">
       <div class="sidebar-top">
         <form id="uploadForm" action="{{ route('account.uploadProfilePicture') }}" method="POST" enctype="multipart/form-data" style="display: none;">
-        @csrf
-        <input
-            type="file"
-            id="profilePictureInput"
-            name="profile_picture"
-            accept="image/*"
-            capture="environment"
-            onchange="document.getElementById('uploadForm').submit()"
-        >
+          @csrf
+          <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" onchange="openCropModal(event)">
+          <input type="hidden" id="croppedImageData" name="cropped_image">
         </form>
 
-        <div class="profile-image" onclick="document.getElementById('profilePictureInput').click()">
-        @if(Auth::user()->profile_picture_url)
-            <img src="{{ Auth::user()->profile_picture_url }}" alt="Profile Picture">
-        @else
-            <div class="placeholder-icon">+</div>
-        @endif
+        <div class="profile-image-container">
+            <div class="profile-image" onclick="document.getElementById('profilePictureInput').click()">
+            @if(Auth::user()->profile_picture_url)
+                <img src="{{ Auth::user()->profile_picture_url }}" alt="Profile Picture">
+            @else
+                <div class="placeholder-icon">+</div>
+            @endif
+            </div>
+            <button type="button" onclick="document.getElementById('profilePictureInput').click()" class="edit-profile-btn">
+                Edit
+            </button>
         </div>
-        <p>My Account</p>
-        <h1>HI!</h1>
-        <nav>
-          <a href="{{ route('account.page')  }}">Dashboard</a>
+        
+        <p>Welcome back,</p>
+        <h1>{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</h1>
+        
+        <nav class="sidebar-nav" aria-label="Account navigation">
+          <a href="{{ route('account.page') }}">Dashboard</a>
           <a href="#">Order History</a>
-          <a href="#">Account Settings</a>
+          <a href="{{ route('account.settings') }}" class="active">Account Settings</a>
         </nav>
       </div>
+      
       <div class="sidebar-bottom">
-        <strong>Need help?</strong>
-        <a href="#">Contact Us</a>
-        <a href="#">FAQ's</a>
-        <a href="#">Log Out</a>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST">
+          @csrf
+          <button type="submit">Log Out</button>
+        </form>
       </div>
     </aside>
-    <main class="main-content">
-      <h2>ACCOUNT SETTINGS</h2>
-      <div class="cards">
-        <section class="card profile-card">
-          <div class="card-header">
-            <span>PROFILE</span>
-            <span class="edit" id="openModal">EDIT</span>
-          </div>
-          <div class="profile-info">
+
+    <main class="main-content" role="main">
+      <section class="card" aria-labelledby="profile-settings-title">
+        <div class="card-header">
+          <h2 id="profile-settings-title">Profile Settings</h2>
+          <a href="#" class="edit" id="openProfileModal" aria-label="Edit Profile">EDIT</a>
+        </div>
+        <div class="info-group">
             <div class="row">
-            <label>Name:</label>
-            <span>{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span>
-            </div>
-            <div class="row">
-            <label>Email:</label>
-            <span>🔒 {{ Auth::user()->email }}</span>
+                <span class="label">Name:</span>
+                <span class="value">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span>
             </div>
             <div class="row">
-            <label>Phone Number:</label>
-            <span>{{ Auth::user()->phone_number }}</span>
+                <span class="label">Email:</span>
+                <span class="value"><i class="fas fa-lock"></i> {{ Auth::user()->email }}</span>
             </div>
             <div class="row">
-            <label>Birthday:</label>
-            <span>{{ Auth::user()->birthday }}</span>
+                <span class="label">Phone:</span>
+                <span class="value">{{ Auth::user()->phone_number ?? 'Not set' }}</span>
             </div>
-          </div>
-        </section>
-        <section class="card password-card">
-          <div class="card-header">
-            <span>PASSWORD</span>
-            <span class="edit">EDIT</span>
-          </div>
-          <div class="password-info" style="margin-top: 20px; user-select:none;">
-            <span style="float:right;">****************</span>
-          </div>
-        </section>
-        <section class="card saved-address-card">
-          <div class="card-header">
-            <span>SAVED ADDRESSES &amp; CONTACTS</span>
-            <span class="edit" style="font-weight: 400; font-size: 14px; cursor: default;">ADD NEW+</span>
-          </div>
-          <div class="saved-address" style="margin-top: 20px;">
-            <div class="address-row">
-              <span>United States</span>
-              <span class="edit">EDIT</span>
+            <div class="row">
+                <span class="label">Birthday:</span>
+                <span class="value">{{ Auth::user()->birthday ? \Carbon\Carbon::parse(Auth::user()->birthday)->format('F d, Y') : 'Not set' }}</span>
             </div>
-          </div>
-        </section>
-        <section class="card communication-card">
-          <div class="card-header">
-            <span>COMMUNICATION SETTINGS</span>
-          </div>
-          <div class="communication-info">
-            <div class="row"><label>Marketing Emails</label><span>Unsubscribed</span></div>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
+      
+      <section class="card" aria-labelledby="security-preferences-title">
+        <div class="card-header">
+          <h2 id="security-preferences-title">Security & Preferences</h2>
+        </div>
+        <div class="info-group">
+            <div class="sub-header">
+                <span class="label" style="text-transform: uppercase;">Password</span>
+                <a href="#" class="edit" id="openChangePasswordModal" aria-label="Edit Password">EDIT</a>
+            </div>
+            <div class="row">
+                <span class="label">Password:</span>
+                <span class="value">************</span>
+            </div>
+        </div>
+        <div class="info-group" style="margin-top: 25px;">
+            <div class="sub-header">
+                <span class="label" style="text-transform: uppercase;">Saved Addresses</span>
+                <a href="#" class="edit" aria-label="Add New Address">ADD NEW+</a>
+            </div>
+            <div class="row">
+                <span class="value">No saved addresses yet.</span>
+            </div>
+        </div>
+        <div class="info-group" style="margin-top: 25px;">
+             <div class="sub-header">
+                <span class="label" style="text-transform: uppercase;">Communication</span>
+            </div>
+            <div class="row">
+                <span class="label">Marketing Emails:</span>
+                <span class="value">Subscribed</span>
+            </div>
+        </div>
+      </section>
     </main>
   </div>
 
-  <!-- MODAL -->
-  <div class="modal-overlay" id="editModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editProfileTitle">
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
       <div class="modal-header">
-        <h1 id="editProfileTitle">EDIT PROFILE</h1>
-        <button class="close-btn" id="closeModal" aria-label="Close"><i class="fas fa-times"></i></button>
+        <h2 id="profileModalTitle">EDIT PROFILE</h2>
+        <button class="close-btn" id="closeProfileModal" aria-label="Close">&times;</button>
       </div>
       <form method="POST" action="{{ route('user.updateProfile') }}">
         @csrf
         <label for="firstName">First Name</label>
-        <input type="text" name="firstName" value="{{ old('firstName', Auth::user()->first_name) }}" />
+        <input type="text" id="firstName" name="firstName" value="{{ old('firstName', Auth::user()->first_name) }}" />
 
         <label for="lastName">Last Name</label>
-        <input type="text" name="lastName" value="{{ old('lastName', Auth::user()->last_name) }}" />
+        <input type="text" id="lastName" name="lastName" value="{{ old('lastName', Auth::user()->last_name) }}" />
 
         <label for="phoneNumber">Phone Number</label>
-        <input type="text" name="phoneNumber" value="{{ old('phoneNumber', Auth::user()->phone_number) }}" />
+        <input type="text" id="phoneNumber" name="phoneNumber" value="{{ old('phoneNumber', Auth::user()->phone_number) }}" />
 
+        <label for="birthday">Birthday</label>
+        <input type="date" id="birthday" name="birthday" value="{{ old('birthday', Auth::user()->birthday) }}" />
+        
         <label for="email">Email</label>
         <div class="email-container">
-        <input type="email" id="email" name="email" value="{{ Auth::user()->email }}" readonly />
-        <i class="fas fa-lock email-lock-icon"></i>
+            <input type="email" name="email" value="{{ Auth::user()->email }}" readonly />
+            <i class="fas fa-lock email-lock-icon"></i>
         </div>
-        <p class="info-text">This information can not be edited.</p>
-        <input type="date" name="birthday" value="{{ old('birthday', Auth::user()->birthday) }}" />
+        <p class="info-text">Email address cannot be edited for security reasons.</p>
 
-        <button type="submit" class="save-btn">SAVE</button>
-        <div class="cancel-text" id="cancelChangePassword">Cancel</div>
+        <button type="submit" class="save-btn">SAVE CHANGES</button>
       </form>
     </div>
   </div>
 
- <!-- MODAL CHANGE PASSWORD -->
-<div class="modal-overlay" id="changePasswordModal">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-header">
-      <h2 id="modalTitle">CHANGE PASSWORD</h2>
-      <button class="close-btn" id="closeChangePasswordModal" aria-label="Close modal">&times;</button>
-    </div>
-    <form method="POST" action="{{ route('user.changePassword') }}">
-      @csrf
-      <label for="password">New Password</label>
-      <input id="password" name="password" type="password" autocomplete="new-password" required />
-      
-      <label for="password_confirmation">Confirm New Password</label>
-      <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required />
-      
-      <button type="submit" class="save-btn">SAVE</button>
-    </form>
-    <div class="cancel-text" id="cancelChangePassword">Cancel</div>
+  <div class="modal-overlay" id="changePasswordModal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="passwordModalTitle">
+          <div class="modal-header">
+              <h2 id="passwordModalTitle">CHANGE PASSWORD</h2>
+              <button class="close-btn" id="closeChangePasswordModal" aria-label="Close">&times;</button>
+          </div>
+          <form id="changePasswordForm" method="POST" action="{{ route('user.changePassword') }}">
+              @csrf
+              <label for="password">New Password</label>
+              <input id="password" name="password" type="password" autocomplete="new-password" required />
+              
+              <label for="password_confirmation">Confirm New Password</label>
+              <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required />
+              
+              <button type="submit" class="save-btn">SAVE NEW PASSWORD</button>
+              <div class="cancel-text" id="cancelPasswordModal">Cancel</div>
+          </form>
+      </div>
   </div>
-</div>
+  
+  <div id="cropModal" class="modal-overlay">
+    <div class="modal" style="background-color: #2a2a2a; border-radius: 10px; padding: 25px;">
+      <span class="close-btn" onclick="closeCropModal()" style="position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h2 style="text-align: center; margin-bottom: 20px;">Crop Your Image</h2>
+      <div style="max-height: 400px; margin-bottom: 20px; background: #121212; border-radius: 8px;">
+        <img id="cropImage" style="display: block; max-width: 100%;">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px;">
+        <button id="cancelCropBtn" onclick="closeCropModal()" style="padding: 10px 20px; border-radius: 8px; cursor: pointer; background-color: transparent; border: 1px solid var(--border-color); color: var(--text-base);">Cancel</button>
+        <button id="cropBtn" style="padding: 10px 20px; border-radius: 8px; cursor: pointer; background-color: var(--text-important); color: var(--bg-dark); font-weight: 700; border: none;">Save & Upload</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toast"></div>
 
-<div id="toast" style="
-  visibility: hidden;
-  min-width: 250px;
-  margin-left: -125px;
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  border-radius: 4px;
-  padding: 16px;
-  position: fixed;
-  left: 50%;
-  bottom: 30px;
-  font-size: 17px;
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.5s, visibility 0.5s;">
-</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- LOGIC DARI SETTINGS.BLADE.PHP ---
+    
+    // Modal Handling
+    function setupModal(openBtnId, closeBtnId, cancelBtnId, modalId) {
+        const openBtn = document.getElementById(openBtnId);
+        const closeBtn = document.getElementById(closeBtnId);
+        const cancelBtn = document.getElementById(cancelBtnId);
+        const modalOverlay = document.getElementById(modalId);
 
-  <script>
-    const openModal = document.getElementById('openModal');
-    const closeModal = document.getElementById('closeModal');
-    const modalOverlay = document.getElementById('editModal');
-    const openProfileModal = document.getElementById('openModal');
-    const closeProfileModal = document.getElementById('closeModal');
-    const profileModalOverlay = document.getElementById('editModal');
+        if (!openBtn || !modalOverlay) return;
 
-    openModal.addEventListener('click', () => {
-      modalOverlay.style.display = 'flex';
-    });
+        const open = (e) => { e.preventDefault(); modalOverlay.style.display = 'flex'; };
+        const close = () => modalOverlay.style.display = 'none';
 
-    closeModal.addEventListener('click', () => {
-      modalOverlay.style.display = 'none';
-    });
+        openBtn.addEventListener('click', open);
+        if(closeBtn) closeBtn.addEventListener('click', close);
+        if(cancelBtn) cancelBtn.addEventListener('click', close);
+        
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) close();
+        });
+    }
 
-    window.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) {
-        modalOverlay.style.display = 'none';
+    setupModal('openProfileModal', 'closeProfileModal', null, 'profileModal');
+    setupModal('openChangePasswordModal', 'closeChangePasswordModal', 'cancelPasswordModal', 'changePasswordModal');
+
+    // Toast Notification
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? '#D32F2F' : '#333';
+        toast.style.visibility = 'visible';
+        toast.style.opacity = '1';
+        toast.style.bottom = '30px';
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.bottom = '0px';
+            setTimeout(() => { toast.style.visibility = 'hidden'; }, 500);
+        }, 3000);
+    }
+
+    // AJAX Password Change
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(changePasswordForm);
+            try {
+                const response = await fetch("{{ route('user.changePassword') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                    },
+                    body: formData,
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    const errorMessage = data.errors?.password?.[0] || data.message || 'Error changing password.';
+                    throw new Error(errorMessage);
+                }
+                document.getElementById('changePasswordModal').style.display = 'none';
+                changePasswordForm.reset();
+                showToast(data.message || 'Password changed successfully!');
+            } catch (error) {
+                showToast(error.message, true);
+            }
+        });
+    }
+
+    // Handle Session Messages for Toast
+    @if(session('success'))
+        showToast("{{ session('success') }}");
+    @endif
+    @if($errors->any())
+        showToast("{{ $errors->first() }}", true);
+    @endif
+
+    // --- LOGIC DARI ACCOUNT.BLADE.PHP (CROPPER) ---
+    
+    let cropper;
+    
+    window.openCropModal = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const cropModal = document.getElementById('cropModal');
+        const cropImage = document.getElementById('cropImage');
+        cropModal.style.display = "flex";
+        cropImage.src = e.target.result;
+        if (cropper) cropper.destroy();
+        
+        cropper = new Cropper(cropImage, {
+            aspectRatio: 1, viewMode: 1, dragMode: 'move', responsive: true, background: false, autoCropArea: 0.8
+        });
+        document.body.style.overflow = 'hidden';
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    document.getElementById('cropBtn').addEventListener('click', function() {
+      if (!cropper) return;
+      
+      const canvas = cropper.getCroppedCanvas({ width: 400, height: 400, fillColor: '#fff' });
+      
+      if (canvas) {
+        canvas.toBlob(function(blob) {
+          const formData = new FormData(document.getElementById('uploadForm'));
+          formData.delete('profile_picture');
+          formData.append('profile_picture', blob, 'profile.png');
+          
+          fetch(document.getElementById('uploadForm').action, {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+          }).then(response => {
+            if (response.ok) window.location.reload();
+            else alert('Upload failed.');
+          }).catch(error => console.error('Error:', error));
+          
+          closeCropModal();
+        }, 'image/png');
       }
     });
-
-    openProfileModal.addEventListener('click', () => {
-    profileModalOverlay.style.display = 'flex';
-  });
-
-  closeProfileModal.addEventListener('click', () => {
-    profileModalOverlay.style.display = 'none';
-  });
-
-  window.addEventListener('click', (e) => {
-    if (e.target === profileModalOverlay) {
-      profileModalOverlay.style.display = 'none';
+    
+    window.closeCropModal = function() {
+        if(cropper) cropper.destroy();
+        document.getElementById('cropModal').style.display = "none";
+        document.body.style.overflow = 'auto';
+        document.getElementById('profilePictureInput').value = '';
     }
-  });
-
-  // NEW: Change Password Modal
-  const openChangePassword = document.querySelector('.password-card .edit');
-  const changePasswordModalOverlay = document.getElementById('changePasswordModal');
-  const closeChangePasswordModal = document.getElementById('closeChangePasswordModal');
-  const cancelChangePassword = document.getElementById('cancelChangePassword');
-
-  openChangePassword.addEventListener('click', () => {
-    changePasswordModalOverlay.style.display = 'flex';
-  });
-
-  closeChangePasswordModal.addEventListener('click', () => {
-    changePasswordModalOverlay.style.display = 'none';
-  });
-
-  cancelChangePassword.addEventListener('click', () => {
-    changePasswordModalOverlay.style.display = 'none';
-  });
-
-  window.addEventListener('click', (e) => {
-    if (e.target === changePasswordModalOverlay) {
-      changePasswordModalOverlay.style.display = 'none';
-    }
-  });
-
-
-  function showToast(message) {
-  const toast = document.getElementById('toast');
-  toast.textContent = message;
-  toast.style.visibility = 'visible';
-  toast.style.opacity = '1';
-
-  // hilangkan toast setelah 3 detik
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.visibility = 'hidden';
-  }, 3000);
-}
-
- changePasswordForm.addEventListener('submit', async function(e) {
-  e.preventDefault();
-
-  const formData = new FormData(changePasswordForm);
-
-  try {
-    const response = await fetch("{{ route('user.changePassword') }}", {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-        'Accept': 'application/json',
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessage = errorData.errors?.password?.[0] || errorData.message || 'Error mengubah password';
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-
-    // tutup modal
-    changePasswordModalOverlay.style.display = 'none';
-
-    // reset form
-    changePasswordForm.reset();
-
-    // tampilkan toast pesan sukses
-    showToast(data.message || 'Password berhasil diubah!');
-  } catch (error) {
-    // tampilkan toast pesan error
-    showToast(error.message);
-  }
 });
-
-document.getElementById('saveProfile').addEventListener('click', function () {
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName = document.getElementById('lastName').value.trim();
-    const phone = document.getElementById('phoneNumber').value.trim();
-    const birthday = document.getElementById('birthday').value.trim();
-
-    // Kirim data ke server via AJAX (opsional, jika backend disiapkan)
-    fetch('/update-profile', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-      },
-      body: JSON.stringify({
-        first_name: firstName,
-        last_name: lastName,
-        phone: phone,
-        birthday: birthday,
-      })
-    }).then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Update tampilan profile card
-          document.getElementById('profileName').textContent = `${firstName} ${lastName}`;
-          document.getElementById('profilePhone').textContent = phone;
-          document.getElementById('profileBirthday').textContent = birthday;
-
-          // Tutup modal
-          document.getElementById('editModal').style.display = 'none';
-        } else {
-          alert('Failed to update profile.');
-        }
-      }).catch(() => alert('Error updating profile.'));
-  });
-
-  // Modal open/close
-  document.getElementById('openModal').onclick = () => {
-    document.getElementById('editModal').style.display = 'block';
-  };
-  document.getElementById('closeModal').onclick = () => {
-    document.getElementById('editModal').style.display = 'none';
-  };
-
-  document.getElementById('openModal').addEventListener('click', () => {
-  document.getElementById('firstName').value = document.getElementById('profileName').textContent.split(' ')[0] || '';
-  document.getElementById('lastName').value = document.getElementById('profileName').textContent.split(' ')[1] || '';
-  document.getElementById('phoneNumber').value = document.getElementById('profilePhone').textContent || '';
-  document.getElementById('birthday').value = document.getElementById('profileBirthday').textContent || '';
-});
-
-  </script>
+</script>
 </body>
 </html>
 @endsection

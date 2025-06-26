@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Providers;
-
-use Illuminate\Support\ServiceProvider;
-
-class AppServiceProvider extends ServiceProvider
-{
+  
+  use Illuminate\Support\ServiceProvider;
+  use App\Models\Address;
+  
+  class AppServiceProvider extends ServiceProvider
+  {
     /**
      * Register any application services.
      */
@@ -23,10 +24,15 @@ class AppServiceProvider extends ServiceProvider
         view()->composer('*', function ($view) {
             if (auth()->check()) {
                 $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
-                $view->with('cartCount', $cartCount);
-            }
-
-            // Tambahkan best sellers ke semua view untuk navigasi search
+                  $view->with('cartCount', $cartCount);
+  
+                  $addresses = Address::where('user_id', auth()->id())->get();
+                  $defaultAddress = $addresses->where('is_default', true)->first();
+                  $view->with('addresses', $addresses);
+                  $view->with('defaultAddress', $defaultAddress);
+              }
+  
+              // Tambahkan best sellers ke semua view untuk navigasi search
             $bestSellers = \App\Models\Menu::select('menus.*', \DB::raw('COALESCE(SUM(order_items.quantity), 0) as total_sold'))
                 ->leftJoin('order_items', 'menus.id', '=', 'order_items.menu_id')
                 ->leftJoin('orders', function($join) {

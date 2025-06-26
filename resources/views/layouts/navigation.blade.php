@@ -110,13 +110,13 @@
 
             <!-- Navigation Links -->
             <div class="hidden md:flex items-center space-x-8">
+                <a href="/" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">Home</a>
                 <a href="/bakeries" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">Bakeries</a>
                 @if(auth()->check() && auth()->user()->is_admin)
                     <a href="{{ route('birthday.admin') }}" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">Birthday</a>
                 @else
                     <a href="{{ route('birthday.user') }}" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">Birthday</a>
                 @endif
-                <a href="/about" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">About Us</a>
             </div>
 
             <!-- Right Side Actions -->
@@ -131,15 +131,18 @@
                 </button>
 
                 <!-- Cart -->
+                @if(auth()->check() && !auth()->user()->is_admin)
                 <a href="/cart" class="relative p-2 hover:bg-pink-primary rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6m14.4-6l-1.2 6M6 19a2 2 0 100 4 2 2 0 000-4zm12 0a2 2 0 100 4 2 2 0 000-4z"/>
                     </svg>
                     <span x-show="cartCount > 0" 
                           x-text="cartCount"
-                          class="absolute -top-1 -right-1 bg-pink-primary text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-semibold">
+                          class="absolute -top-1 -right-1 bg-pink-primary text-black text-xs rounded-full px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-semibold"
+                          style="color:#111;">
                     </span>
                 </a>
+                @endif
 
                 <!-- Profile -->
                 <div class="relative" x-data="{ open: false }">

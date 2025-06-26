@@ -3,101 +3,104 @@
 @section('content')
 
 <style>
-    body {
-        background-color: #ffffff;
-        font-family: 'Segoe UI', sans-serif;
+    :root {
+        --bg-dark: rgb(0, 0, 0);
+        --card-bg: rgb(18, 18, 18);
+        --border-color: rgb(40, 40, 40);
+        --text-base: rgb(245, 245, 245);
+        --text-important: rgb(254, 198, 228); /* Pastel Pink */
+        --text-secondary: #b0b0b0;
+        --text-white: #ffffff;
     }
 
+    body {
+        background-color: var(--bg-dark);
+        font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        color: var(--text-base);
+    }
+
+    /* --- Area Header --- */
     .header-area {
         text-align: center;
-        padding: 40px 20px 20px;
+        padding: 40px 20px 30px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 30px;
     }
 
     .header-area h1 {
         font-size: 32px;
         font-weight: 700;
-        color: #2c3e50;
+        color: var(--text-important);
+        margin-bottom: 15px;
     }
 
     .btn-add {
-        background-color: #e67e22;
-        color: white;
-        padding: 10px 20px;
+        background-color: var(--text-important);
+        color: var(--bg-dark);
+        padding: 12px 25px;
         text-decoration: none;
         border-radius: 8px;
-        font-weight: 600;
+        font-weight: 700;
         display: inline-block;
-        margin-top: 10px;
+        transition: background-color 0.3s ease;
     }
 
     .btn-add:hover {
-        background-color: #d35400;
+        background-color: var(--text-white);
     }
 
-    .product-grid {
+    /* --- Layout Daftar Produk (Horizontal) --- */
+    .product-list-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .product-item {
         display: flex;
-        flex-wrap: wrap;
-        gap: 24px;
-        padding: 30px;
-        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+        transition: border-color 0.3s ease;
     }
 
-    .card {
-        background-color: #fff;
-        border-radius: 16px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    .product-item:hover {
+        border-color: var(--text-important);
+    }
+
+    /* --- Gambar Produk & Carousel --- */
+    .item-image {
+        width: 150px;
+        height: 150px;
+        flex-shrink: 0;
+        border-radius: 8px;
         overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        width: 260px;
-    }
-
-    .card-img-container {
         position: relative;
-        height: 220px;
-        overflow: hidden;
     }
 
-    .card img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    /* Carousel styles */
-    .image-carousel {
-        position: relative;
-        height: 220px;
-        overflow: hidden;
-    }
-
-    .carousel-inner {
-        display: flex;
-        transition: transform 0.5s ease;
-        height: 100%;
-    }
-
-    .carousel-item {
-        min-width: 100%;
-        height: 100%;
-    }
-
-    .carousel-item img {
+    .item-image .image-carousel,
+    .item-image .card-img-container,
+    .item-image .carousel-inner,
+    .item-image .carousel-item,
+    .item-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-
+    
     .carousel-control {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background-color: rgba(0,0,0,0.5);
-        color: white;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: var(--text-white);
         border: none;
-        width: 30px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -105,194 +108,239 @@
         cursor: pointer;
         z-index: 2;
         font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .item-image:hover .carousel-control {
+        opacity: 1;
     }
 
-    .carousel-control-prev {
-        left: 10px;
-    }
+    .carousel-control-prev { left: 8px; }
+    .carousel-control-next { right: 8px; }
 
-    .carousel-control-next {
-        right: 10px;
-    }
-
-    .card-body {
-        padding: 16px;
-        flex: 1;
+    /* --- Detail Produk --- */
+    .item-details {
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
+        gap: 8px;
     }
 
-    .card-title {
-        font-weight: bold;
+    .item-details .item-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-base);
+    }
+
+    .item-details .item-description {
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+
+    .item-details .item-meta {
+        font-size: 14px;
+        color: var(--text-base);
+    }
+
+    .item-price {
         font-size: 18px;
-        margin-bottom: 8px;
-        color: #2c3e50;
-    }
-
-    .card-text {
-        font-size: 14px;
-        color: #7f8c8d;
-        margin-bottom: 8px;
-    }
-
-    .card-price {
         font-weight: bold;
-        font-size: 16px;
-        color: #e67e22;
-        margin-bottom: 12px;
+        color: var(--text-important);
+        margin-top: 8px;
     }
 
-    .btn-group {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .btn-sm {
-        font-size: 14px;
-        padding: 6px 12px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .btn-warning {
-        background-color: #f1c40f;
-        color: #2c3e50;
-    }
-
-    .btn-danger {
-        background-color: #e74c3c;
-        color: #fff;
-    }
-
-    .alert {
-        max-width: 700px;
-        margin: 20px auto;
-        background-color: #d4edda;
-        color: #155724;
-        padding: 15px;
-        border-radius: 8px;
-    }
-
+    /* --- Lencana Status --- */
     .badge-status {
         display: inline-block;
-        padding: 4px 8px;
-        border-radius: 4px;
+        padding: 5px 12px;
+        border-radius: 6px;
         font-size: 12px;
         font-weight: bold;
-        margin-bottom: 8px;
     }
 
     .badge-available {
-        background-color: #2ecc71;
-        color: white;
+        background-color: var(--text-important);
+        color: var(--bg-dark);
     }
 
     .badge-unavailable {
-        background-color: #e74c3c;
-        color: white;
+        background-color: var(--border-color);
+        color: var(--text-secondary);
+    }
+
+    /* --- Tombol Aksi --- */
+    .item-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .btn-action {
+        padding: 8px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 6px;
+        text-align: center;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        min-width: 100px; /* Lebar tombol sama */
+    }
+
+    /* Tombol Edit */
+    .btn-edit {
+        background-color: var(--text-important);
+        color: var(--bg-dark);
+    }
+    .btn-edit:hover {
+        background-color: var(--text-white);
+    }
+
+    /* Tombol Hapus */
+    .btn-delete {
+        background-color: var(--bg-dark);
+        color: var(--text-important);
+        border: 1px solid var(--text-important);
+    }
+    .btn-delete:hover {
+        background-color: var(--text-important);
+        color: var(--bg-dark);
+    }
+
+    .alert {
+        max-width: 1160px;
+        margin: 20px auto;
+        background-color: var(--card-bg);
+        color: var(--text-base);
+        padding: 15px 20px;
+        border-radius: 8px;
+        border-left: 5px solid var(--text-important);
     }
 </style>
 
-@section('header')
-    <h1 class="text-center font-bold text-xl py-4">Daftar Kue Ulang Tahun</h1>
-@endsection
-
 <div class="header-area">
-    <a href="{{ route('birthday.create') }}?type=birthday" class="btn-add">Tambah Kue Ulang Tahun</a>
+    <h1>Daftar Kue Ulang Tahun</h1>
+    {{-- Assuming the admin check logic is the same --}}
+    @if(auth()->user()->is_admin)
+        {{-- Updated route to match the original birthday blade --}}
+        <a href="{{ route('birthday.create') }}?type=birthday" class="btn-add">Tambah Kue</a>
+    @endif
 </div>
 
 @if(session('success'))
     <div class="alert">{{ session('success') }}</div>
 @endif
 
-<div class="product-grid">
+<div class="product-list-container">
     @foreach($birthdayCakes as $cake)
-    <div class="card">
-        <div class="image-carousel" id="carousel-{{ $cake->id }}">
-            @if($cake->images)
-                <div class="carousel-inner">
-                    @php
-                        $images = json_decode($cake->images);
-                    @endphp
-                    @foreach($images as $index => $imagePath)
-                        <div class="carousel-item" data-index="{{ $index }}">
-                            <img src="{{ asset('storage/'.$imagePath) }}" alt="{{ $cake->name }} image {{ $index + 1 }}">
-                        </div>
-                    @endforeach
-                </div>
-                @if(count($images) > 1)
-                    <button class="carousel-control carousel-control-prev" onclick="prevSlide('carousel-{{ $cake->id }}')">&#10094;</button>
-                    <button class="carousel-control carousel-control-next" onclick="nextSlide('carousel-{{ $cake->id }}')">&#10095;</button>
+    <div class="product-item">
+        <div class="item-image">
+            <div class="image-carousel" id="carousel-{{ $cake->id }}">
+                @if($cake->images && count(json_decode($cake->images)) > 0)
+                    <div class="carousel-inner">
+                        @php $images = json_decode($cake->images); @endphp
+                        @foreach($images as $index => $imagePath)
+                            <div class="carousel-item" data-index="{{ $index }}">
+                                <img src="{{ asset('storage/'.$imagePath) }}" alt="{{ $cake->name }} image {{ $index + 1 }}">
+                            </div>
+                        @endforeach
+                    </div>
+                    @if(count($images) > 1)
+                        <button class="carousel-control carousel-control-prev" onclick="prevSlide('carousel-{{ $cake->id }}')">&#10094;</button>
+                        <button class="carousel-control carousel-control-next" onclick="nextSlide('carousel-{{ $cake->id }}')">&#10095;</button>
+                    @endif
+                @else
+                    {{-- Fallback for single or no image --}}
+                    <div class="card-img-container">
+                        <img src="https://via.placeholder.com/150x150?text=No+Image" alt="No image available">
+                    </div>
                 @endif
-            @else
-                <img src="https://via.placeholder.com/300x220?text=No+Image" alt="No image">
-            @endif
+            </div>
         </div>
 
-        <div class="card-body">
-            <div class="card-title">{{ $cake->name }}</div>
+        <div class="item-details">
+            <div class="item-title">{{ $cake->name }}</div>
             <div>
-                <span class="badge-status {{ $cake->available ? 'badge-available' : 'badge-unavailable' }}">
-                    {{ $cake->available ? 'Tersedia' : 'Tidak Tersedia' }}
-                </span>
+                @if(isset($cake->available))
+                    <span class="badge-status {{ $cake->available ? 'badge-available' : 'badge-unavailable' }}">
+                        {{ $cake->available ? 'Tersedia' : 'Tidak Tersedia' }}
+                    </span>
+                @endif
             </div>
-            <div class="card-text">{{ Str::limit($cake->description, 100) }}</div>
-            <div class="card-text"><strong>Rasa:</strong> {{ $cake->flavor ?? '-' }}</div>
-            <div class="card-text"><strong>Stok:</strong> {{ $cake->stok }} pcs</div>
-            <div class="card-price">Rp {{ number_format($cake->price, 0, ',', '.') }}</div>
+            <p class="item-description">{{ Str::limit($cake->description, 150) }}</p>
+            <div class="item-meta">
+                {{-- Details specific to birthday cakes --}}
+                <strong>Rasa:</strong> {{ $cake->flavor ?? 'N/A' }} | <strong>Stok:</strong> {{ $cake->stok }} pcs
+            </div>
+            <div class="item-price">Rp {{ number_format($cake->price, 0, ',', '.') }}</div>
+        </div>
 
-            <div class="btn-group">
-                <a href="{{ route('menus.edit', $cake->id) }}" class="btn-sm btn-warning">Edit</a>
-                <form action="{{ route('menus.destroy', $cake->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus kue ulang tahun?')">
+        <div class="item-actions">
+            @if(auth()->user()->is_admin)
+                {{-- Routes are kept from the original birthday blade --}}
+                <a href="{{ route('menus.edit', $cake->id) }}" class="btn-action btn-edit">Edit</a>
+                <form action="{{ route('menus.destroy', $cake->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus kue ulang tahun ini?')">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn-sm btn-danger">Hapus</button>
+                    <button type="submit" class="btn-action btn-delete">Hapus</button>
                 </form>
-            </div>
+            @endif
+            {{-- Non-admin actions can be added here if needed --}}
         </div>
     </div>
     @endforeach
 </div>
 
 <script>
-    // Carousel functionality for multiple images
+    // This script is identical to the one in menu_admin.blade.php
+    const carousels = {};
+
     function initCarousels() {
-        // Initialize all carousels with their first slide
-        const carousels = document.querySelectorAll('.image-carousel');
-        carousels.forEach(carousel => {
+        const carouselElements = document.querySelectorAll('.image-carousel');
+        carouselElements.forEach(carousel => {
             const id = carousel.id;
-            window[id] = { currentIndex: 0 };
+            carousels[id] = { currentIndex: 0 };
+            showSlide(id, 0);
         });
     }
 
     function showSlide(carouselId, index) {
         const carousel = document.getElementById(carouselId);
+        if (!carousel) return;
+        
         const inner = carousel.querySelector('.carousel-inner');
+        if (!inner) return;
+
         const items = inner.querySelectorAll('.carousel-item');
+        const state = carousels[carouselId];
 
         if (!items.length) return;
 
         if (index >= items.length) {
-            window[carouselId].currentIndex = 0;
+            state.currentIndex = 0;
         } else if (index < 0) {
-            window[carouselId].currentIndex = items.length - 1;
+            state.currentIndex = items.length - 1;
         } else {
-            window[carouselId].currentIndex = index;
+            state.currentIndex = index;
         }
 
-        inner.style.transform = `translateX(-${window[carouselId].currentIndex * 100}%)`;
+        inner.style.transform = `translateX(-${state.currentIndex * 100}%)`;
     }
 
     function nextSlide(carouselId) {
-        showSlide(carouselId, window[carouselId].currentIndex + 1);
+        const state = carousels[carouselId];
+        showSlide(carouselId, state.currentIndex + 1);
     }
 
     function prevSlide(carouselId) {
-        showSlide(carouselId, window[carouselId].currentIndex - 1);
+        const state = carousels[carouselId];
+        showSlide(carouselId, state.currentIndex - 1);
     }
 
-    // Initialize all carousels when the page loads
     document.addEventListener('DOMContentLoaded', initCarousels);
 </script>
+
 @endsection

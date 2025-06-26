@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1250px;
   margin: 32px auto;
   padding: 32px 24px;
 }
@@ -296,7 +296,6 @@ hr {
 /* Card Kanan - Atur Jumlah dan Catatan */
 .right-card {
   flex: 0 0 340px;
-
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 4px 32px rgba(0,0,0,0.3);
@@ -536,7 +535,7 @@ hr {
   transition: none;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1250px) {
   .container {
     max-width: 100vw;
     margin: 16px;
@@ -657,6 +656,9 @@ hr {
   overflow: hidden;
   border-radius: 8px;
 }
+
+#map { height: 300px !important; width: 100% !important; min-height: 200px; }
+#map-container { min-height: 300px; }
 </style>
 
 <div class="container" role="main">
@@ -878,6 +880,36 @@ hr {
         ></textarea>
       </div>
 
+      <!-- Address Section -->
+      <div class="address-section" style="margin-bottom: 20px;">
+        <div id="address-display-section">
+          @if(isset($addresses) && count($addresses) > 0)
+            <div id="address-list-section" style="margin-top:16px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                <span style="font-size:14px; color:#fec6e4; font-weight:600;">Alamat Pengiriman:</span>
+                
+              </div>
+              <select id="address-select" class="notes-input" name="address_id" style="min-height:44px; margin-bottom:10px;">
+                @foreach($addresses as $address)
+                  <option value="{{ $address->id }}" {{ (isset($defaultAddress) && $defaultAddress && $defaultAddress->id == $address->id) ? 'selected' : ($loop->last && !isset($defaultAddress) ? 'selected' : '') }}>
+                    {{ $address->label }} {{ $address->is_default ? '(Utama)' : '' }} - {{ $address->address_line_1 }}{{ $address->address_line_2 ? ', ' . $address->address_line_2 : '' }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+          @else
+            <div style="color: rgb(254, 198, 228); font-size: 14px; margin-bottom: 8px;">Anda belum memiliki alamat pengiriman.</div>
+            <button type="button" id="openAddressModal" class="btn-primary" style="background:transparent; color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); text-align:center; padding:10px 0; display:block;">Tambah Alamat</button>
+          @endif
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+                  <button type="button" id="openAddressModal" class="btn-primary" style="background:transparent; background-color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); font-size:13px; font-weight:700; padding:6px 16px; border-radius:8px; cursor:pointer;">Tambah Alamat</button>
+                  <button type="button" id="deleteAddressBtn" class="btn-primary" style="background:transparent; color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); font-size:14px; font-weight:700; padding:6px 18px; border-radius:8px; cursor:pointer; margin-left:4px;" title="Hapus alamat terpilih">
+                    Delete
+                  </button>
+                </div>
+      </div>
+
       <div class="subtotal-row">
   <span>Subtotal</span>
   <strong id="subtotal">
@@ -892,6 +924,8 @@ hr {
         <input type="hidden" name="menu_id" value="{{ $menu->id }}">
         <input type="hidden" name="quantity" id="cart-quantity" value="1">
         <input type="hidden" name="notes" id="cart-notes" value="">
+        <!-- Address ID -->
+        <input type="hidden" name="address_id" id="cart-address-id" value="{{ isset($defaultAddress) ? $defaultAddress->id : (isset($addresses) && count($addresses) > 0 ? $addresses->first()->id : '') }}">
         <button id="add-to-cart-btn" class="btn-primary" type="button" onclick="addToCart()">+ Keranjang</button>
       </form>
       <button class="btn-secondary" type="button" onclick="buyNow()">Beli Langsung</button>
@@ -910,7 +944,34 @@ hr {
   </div>
 </div>
 
-
+<!-- Modal Form Alamat -->
+<div id="addressModal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
+  <div style="background:#111; border-radius:14px; max-width:400px; width:95%; margin:auto; padding:32px 24px; position:relative; box-shadow:0 8px 32px rgba(0,0,0,0.4); max-height:90vh; overflow-y:auto;">
+    <button id="closeAddressModal" style="position:absolute; top:12px; right:18px; background:none; border:none; color:#fec6e4; font-size:2rem; cursor:pointer;">&times;</button>
+    <h3 style="color:#fec6e4; font-weight:700; font-size:1.3rem; margin-bottom:18px;">Tambah Alamat Baru</h3>
+    <form id="addressForm">
+      <div style="margin-bottom:12px;">
+        <div id="reverse-geocode-result" style="background:#000; color:#fff; border-radius:10px; padding:12px 14px; font-size:1rem; margin-bottom:12px; min-height:40px;">Pilih lokasi pada peta</div>
+        <div id="map-container" style="margin-top:0; display:block;">
+          <div id="map" style="height:300px; width:100%; border-radius:8px; border:1px solid #333;"></div>
+          <div style="margin-top:8px; font-size:12px; color:#888;">
+            Klik pada peta untuk menentukan lokasi pinpoint
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="color:#fec6e4; font-weight:600; font-size:0.97rem;">
+          <input type="checkbox" name="is_default" value="1" style="margin-right:6px;"> Jadikan sebagai alamat utama
+        </label>
+      </div>
+      <input type="hidden" name="latitude" id="address-latitude" />
+      <input type="hidden" name="longitude" id="address-longitude" />
+      <input type="hidden" name="reverse_geocode" id="address-reverse-geocode" />
+      <button type="submit" class="btn-primary" style="width:100%;">Simpan Alamat</button>
+      <div id="addressFormError" style="color:#ef4444; font-size:13px; margin-top:10px; display:none;"></div>
+    </form>
+  </div>
+</div>
 
 <script>
   // Carousel functionality
@@ -998,36 +1059,57 @@ hr {
   decreaseBtn.disabled = true;
   increaseBtn.disabled = maxStock <= 1;
   
+  // Address select logic
+  const addressSelect = document.getElementById('address-select');
+  const cartAddressInput = document.getElementById('cart-address-id');
+  const addressDetail = document.getElementById('address-detail-text');
+  let addresses = @json($addresses ?? []);
+
+  if (addressSelect && cartAddressInput) {
+    addressSelect.addEventListener('change', function() {
+      cartAddressInput.value = this.value;
+      // Update address detail
+      const selected = addresses.find(a => a.id == this.value);
+      if (selected && addressDetail) {
+        addressDetail.textContent = `${selected.address_line_1}${selected.address_line_2 ? ', ' + selected.address_line_2 : ''}, ${selected.city}, ${selected.state}, ${selected.postal_code}, ${selected.country}`;
+      }
+    });
+  }
+  
   function addToCart() {
     const isLoggedIn = {{ $isLoggedIn ? 'true' : 'false' }};
-    
     if (!isLoggedIn) {
       window.location.href = "{{ route('login') }}?redirect=" + encodeURIComponent(window.location.href);
       return;
     }
     
-    const button = document.getElementById('add-to-cart-btn');
-    const animation = document.getElementById('cart-animation');
-    const form = document.getElementById('add-to-cart-form');
+    // Pastikan address_id ikut dikirim
+    if (cartAddressInput && !cartAddressInput.value) {
+      alert('Silakan pilih alamat pengiriman terlebih dahulu.');
+      return;
+    }
     
-    const buttonRect = button.getBoundingClientRect();
-    const buttonX = buttonRect.left + buttonRect.width / 2;
-    const buttonY = buttonRect.top + buttonRect.height / 2;
+    // Update input hidden sebelum submit
+    cartQuantityInput.value = quantityInput.value;
+    cartNotesInput.value = notesTextarea.value;
+    if (addressSelect) {
+      cartAddressInput.value = addressSelect.value;
+    }
     
-    const cartIconX = window.innerWidth - 20;
-    const cartIconY = 20;
+    const formData = new FormData(document.getElementById('add-to-cart-form'));
     
-    animation.style.left = `${buttonX - 25}px`;
-    animation.style.top = `${buttonY - 25}px`;
-    animation.style.opacity = '1';
-
-    const formData = new FormData(form);
-    fetch(form.action, {
+    // Tampilkan loading state
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
+    const originalText = addToCartBtn.textContent;
+    addToCartBtn.textContent = 'Menambahkan...';
+    addToCartBtn.disabled = true;
+    
+    fetch("{{ route('carts.store') }}", {
       method: 'POST',
       body: formData,
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
       }
     })
     .then(response => response.json())
@@ -1044,15 +1126,17 @@ hr {
         }
 
         setTimeout(() => {
-          animation.style.transition = 'all 0.8s cubic-bezier(0.2, 1, 0.3, 1)';
-          animation.style.left = `${cartIconX - 25}px`;
-          animation.style.top = `${cartIconY - 25}px`;
-          animation.style.transform = 'scale(0.5)';
+          const cartAnimation = document.getElementById('cart-animation');
+          cartAnimation.style.transition = 'all 0.8s cubic-bezier(0.2, 1, 0.3, 1)';
+          cartAnimation.style.left = 'calc(100% - 25px)';
+          cartAnimation.style.top = 'calc(100% - 25px)';
+          cartAnimation.style.transform = 'scale(0.5)';
         }, 10);
 
         setTimeout(() => {
-          animation.style.opacity = '0';
-          animation.style.transform = 'scale(0.2)';
+          const cartAnimation = document.getElementById('cart-animation');
+          cartAnimation.style.opacity = '0';
+          cartAnimation.style.transform = 'scale(0.2)';
           alert('Produk berhasil ditambahkan ke keranjang!');
         }, 800);
       } else {
@@ -1062,18 +1146,20 @@ hr {
     .catch(error => {
       console.error('Error:', error);
       alert('Terjadi kesalahan saat menambahkan produk ke keranjang.');
+    })
+    .finally(() => {
+      // Restore button state
+      addToCartBtn.textContent = originalText;
+      addToCartBtn.disabled = false;
     });
   }
   
   function buyNow() {
     const isLoggedIn = {{ $isLoggedIn ? 'true' : 'false' }};
-    
     if (!isLoggedIn) {
       window.location.href = "{{ route('login') }}?redirect=" + encodeURIComponent(window.location.href);
       return;
     }
-    
-    // Ambil data dari form
     const menuId = document.querySelector('input[name="menu_id"]').value;
     const quantity = document.getElementById('cart-quantity').value;
     const notes = document.getElementById('cart-notes').value;
@@ -1088,7 +1174,7 @@ hr {
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';
     csrfToken.name = '_token';
-    csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
+    csrfToken.value = document.querySelector('meta[name=csrf-token]').content;
     checkoutForm.appendChild(csrfToken);
     
     // Tambahkan data menu yang akan dibeli
@@ -1120,10 +1206,256 @@ hr {
     document.body.appendChild(checkoutForm);
     checkoutForm.submit();
   }
+
+  // Modal Alamat
+  const openAddressModalBtn = document.getElementById('openAddressModal');
+  const addressModal = document.getElementById('addressModal');
+  const closeAddressModalBtn = document.getElementById('closeAddressModal');
+
+  let map = null;
+  let marker = null;
+  const reverseGeocodeResult = document.getElementById('reverse-geocode-result');
+
+  function setLatLngInputs(lat, lng) {
+    document.getElementById('address-latitude').value = lat;
+    document.getElementById('address-longitude').value = lng;
+  }
+
+  function setReverseGeocodeInput(text) {
+    document.getElementById('address-reverse-geocode').value = text;
+  }
+
+  function reverseGeocode(lat, lng) {
+    setLatLngInputs(lat, lng);
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.display_name) {
+          reverseGeocodeResult.textContent = data.display_name;
+          setReverseGeocodeInput(data.display_name);
+        } else {
+          reverseGeocodeResult.textContent = 'Alamat tidak ditemukan';
+          setReverseGeocodeInput('');
+        }
+      })
+      .catch(() => {
+        reverseGeocodeResult.textContent = 'Gagal mengambil alamat';
+        setReverseGeocodeInput('');
+      });
+  }
+
+  function initMapModal() {
+    const mapElement = document.getElementById('map');
+    if (!mapElement) return;
+    if (map) {
+      map.remove();
+      map = null;
+    }
+    const defaultLat = -6.2088;
+    const defaultLng = 106.8456;
+    map = L.map('map').setView([defaultLat, defaultLng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+    marker.on('dragend', function(e) {
+      const position = e.target.getLatLng();
+      reverseGeocode(position.lat, position.lng);
+    });
+    map.on('click', function(e) {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      marker.setLatLng([lat, lng]);
+      reverseGeocode(lat, lng);
+    });
+    // Gunakan lokasi user jika tersedia
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        map.setView([lat, lng], 15);
+        marker.setLatLng([lat, lng]);
+        reverseGeocode(lat, lng);
+      }, function() {
+        // Jika gagal, tetap gunakan default
+        reverseGeocode(defaultLat, defaultLng);
+      });
+    } else {
+      reverseGeocode(defaultLat, defaultLng);
+    }
+    setTimeout(() => { map.invalidateSize(); }, 300);
+  }
+
+  if (openAddressModalBtn && addressModal) {
+    openAddressModalBtn.onclick = () => {
+      addressModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      setTimeout(initMapModal, 200);
+    };
+    closeAddressModalBtn.onclick = () => { addressModal.style.display = 'none'; document.body.style.overflow = 'auto'; };
+    addressModal.onclick = (e) => { if (e.target === addressModal) { addressModal.style.display = 'none'; document.body.style.overflow = 'auto'; } };
+  }
+
+  // Handle submit form alamat
+  const addressForm = document.getElementById('addressForm');
+  const addressFormError = document.getElementById('addressFormError');
+  if (addressForm) {
+    addressForm.onsubmit = function(e) {
+      e.preventDefault();
+      addressFormError.style.display = 'none';
+      const formData = new FormData(addressForm);
+      fetch('/addresses', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+        },
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.id || data.success) {
+          window.location.reload();
+        } else {
+          addressFormError.textContent = data.message || 'Gagal menambah alamat.';
+          addressFormError.style.display = 'block';
+        }
+      })
+      .catch(err => {
+        addressFormError.textContent = 'Terjadi kesalahan. Coba lagi.';
+        addressFormError.style.display = 'block';
+      });
+    }
+  }
+
+  // Pinpoint bar logic
+  const pinpointSetBtn = document.getElementById('pinpoint-set-btn');
+  const pinpointInputWrapper = document.getElementById('pinpoint-input-wrapper');
+  const mapContainer = document.getElementById('map-container');
+  const mapElement = document.getElementById('map');
+  const latitudeInput = document.getElementById('latitude');
+  const longitudeInput = document.getElementById('longitude');
+  const pinpointInput = document.querySelector('input[name="pinpoint"]');
+  
+  if (pinpointSetBtn && pinpointInputWrapper) {
+    pinpointSetBtn.onclick = function() {
+      const isVisible = pinpointInputWrapper.style.display !== 'none';
+
+      // Ambil elemen input yang ingin di-disable/enable
+      const labelInput = document.querySelector('input[name="label"]');
+      const kotaInput = document.querySelector('input[name="address_line_1"]');
+      const alamatLengkapInput = document.querySelector('input[name="address_line_2"]');
+
+      if (!isVisible) {
+        pinpointInputWrapper.style.display = 'block';
+        mapContainer.style.display = 'block';
+
+        // Disable field saat map aktif
+        if (labelInput) labelInput.disabled = true;
+        if (kotaInput) kotaInput.disabled = true;
+        if (alamatLengkapInput) alamatLengkapInput.disabled = true;
+
+        setTimeout(() => {
+          if (map) {
+            map.remove();
+            map = null;
+          }
+          initMap();
+        }, 200);
+      } else {
+        pinpointInputWrapper.style.display = 'none';
+        mapContainer.style.display = 'none';
+
+        // Enable field saat map nonaktif
+        if (labelInput) labelInput.disabled = false;
+        if (kotaInput) kotaInput.disabled = false;
+        if (alamatLengkapInput) alamatLengkapInput.disabled = false;
+      }
+    };
+  }
+  
+  function initMap() {
+    console.log('initMap called');
+    const defaultLat = -6.2088;
+    const defaultLng = 106.8456;
+
+    map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+    marker.on('dragend', function(e) {
+      const position = e.target.getLatLng();
+      updateCoordinates(position.lat, position.lng);
+      reverseGeocode(position.lat, position.lng);
+    });
+
+    map.on('click', function(e) {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      marker.setLatLng([lat, lng]);
+      updateCoordinates(lat, lng);
+      reverseGeocode(lat, lng);
+    });
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        map.setView([lat, lng], 15);
+        marker.setLatLng([lat, lng]);
+        updateCoordinates(lat, lng);
+        reverseGeocode(lat, lng);
+      }, function(error) {
+        console.log('Geolocation error:', error);
+      });
+    }
+  }
+  
+  function updateCoordinates(lat, lng) {
+    latitudeInput.value = lat;
+    longitudeInput.value = lng;
+  }
+
+  // Handler untuk hapus alamat dari dropdown
+  const deleteAddressBtn = document.getElementById('deleteAddressBtn');
+  if (deleteAddressBtn && addressSelect) {
+    deleteAddressBtn.onclick = function() {
+      const id = addressSelect.value;
+      if (!id) return alert('Pilih alamat yang ingin dihapus.');
+      if (!confirm('Yakin ingin menghapus alamat ini?')) return;
+      fetch(`/addresses/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+        }
+      })
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => {
+        // Hapus option dari dropdown
+        const opt = addressSelect.querySelector(`option[value="${id}"]`);
+        if (opt) opt.remove();
+        // Pilih option pertama jika ada
+        if (addressSelect.options.length > 0) {
+          addressSelect.selectedIndex = 0;
+          addressSelect.dispatchEvent(new Event('change'));
+        }
+        // Jika kosong, tampilkan pesan
+        if (addressSelect.options.length === 0) {
+          addressSelect.innerHTML = '<option disabled selected>Tidak ada alamat</option>';
+        }
+      })
+      .catch(() => alert('Gagal menghapus alamat.'));
+    };
+  }
 </script>
 
 <!-- Review Section - Black & Pink Theme -->
-<div class="review-black-pink-style" style="max-width: 1200px; margin: 32px auto; padding: 0 24px;">
+<div class="review-black-pink-style" style="max-width: 1250px; margin: 32px auto; padding: 0 24px;">
   @php
     // Ambil review untuk menu ini
     $menuReviews = \App\Models\Review::where('menu_id', $menu->id)
@@ -1229,27 +1561,7 @@ hr {
           </div>
           @endif
           
-          <!-- Review Footer -->
-          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #333;">
-            <div style="color: #aaa; font-size: 13px;">
-              Order ID: {{ substr($review->order->order_code ?? 'ORD-XXXXXXXX', 0, 8) }}...
-            </div>
-            <div style="display: flex; align-items: center;">
-              <button style="background: none; border: none; color: #aaa; font-size: 14px; display: flex; align-items: center; cursor: pointer; margin-right: 16px; transition: all 0.2s ease; padding: 6px 10px; border-radius: 20px; hover:background: rgba(254, 198, 228, 0.1);">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
-                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                </svg>
-                Membantu
-              </button>
-              <button style="background: none; border: none; color: #aaa; font-size: 14px; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; padding: 6px 10px; border-radius: 20px; hover:background: rgba(254, 198, 228, 0.1);">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
-                  <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
-                </svg>
-                Tidak Membantu
-              </button>
-            </div>
-          </div>
-        </div>
+          
       @empty
         <div style="padding: 48px 24px; text-align: center; background: #000000;">
           <div style="margin-bottom: 20px;">
@@ -1389,5 +1701,10 @@ hr {
     }
   });
 </script>
+
+@push('head')
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+@endpush
 
 @endsection

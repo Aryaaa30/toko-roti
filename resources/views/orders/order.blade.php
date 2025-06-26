@@ -2,487 +2,309 @@
 
 @section('content')
 <style>
+    /* --- Color & Theme Variables (TIDAK DIUBAH) --- */
+    :root {
+        --bg-dark: rgb(10, 10, 10);
+        --card-bg: rgb(18, 18, 18);
+        --border-color: rgb(40, 40, 40);
+        
+        /* Custom Color Palette */
+        --text-base: rgb(245, 245, 245);
+        --text-important: rgb(254, 198, 228); /* Pastel Pink */
+        --text-secondary: #b0b0b0;
+        --text-white: #ffffff;
+        
+        /* Action & Status Colors */
+        --color-success: rgb(254, 198, 228);  /* Hijau untuk delivered/completed */
+        --color-warning: #f1c40f;  /* Kuning untuk processed/pending */
+        --color-info: #3498db;
+        --color-danger: #e74c3c;
+    }
+
+    /* --- General Resets & Dark Theme --- */
     body {
-        background-color: #ffffff;
-        font-family: 'Segoe UI', sans-serif;
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-base);
     }
 
-    .header-area {
-        text-align: center;
-        padding: 40px 20px 20px;
+    /* --- Main Layout: Sidebar + Content --- */
+    .account-container {
+        display: flex;
+        gap: 40px;
+        max-width: 1600px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+        align-items: flex-start;
     }
 
-    .header-area h1 {
-        font-size: 32px;
-        font-weight: 700;
-        color: #2c3e50;
-    }
+    /* --- Sidebar Styling (Tidak Diubah) --- */
+    .sidebar {
+      background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    flex: 0 0 340px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: sticky;
+    top: 2rem;
+  }
+    
+    .sidebar-header h2 { font-size: 24px; font-weight: 700; color: var(--text-important); line-height: 1.2; }
+    .sidebar-header p { font-size: 14px; color: var(--text-secondary); margin-bottom: 2.5rem; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 1.2rem; }
+    .sidebar-nav a { color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 16px; padding: 8px 15px; border-radius: 8px; border-left: 3px solid transparent; transition: all 0.3s ease; }
+    .sidebar-nav a:hover { background-color: rgba(255, 255, 255, 0.05); color: var(--text-white); }
+    .sidebar-nav a.active { background-color: rgba(254, 198, 228, 0.1); color: var(--text-important); font-weight: 700; border-left: 3px solid var(--text-important); }
+    .sidebar-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+    .sidebar-footer button { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 16px; font-weight: 500; padding: 8px 15px; width: 100%; text-align: left; font-family: 'Inter', sans-serif; }
+    .sidebar-footer button:hover { color: var(--color-danger); }
 
-    .btn-add {
-        background-color: #e67e22;
-        color: white;
-        padding: 10px 20px;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: 600;
-        display: inline-block;
-        margin-top: 10px;
-    }
+    /* --- Main Content (Konten Utama) --- */
+    .main-content { flex: 1; padding-left: 7.5rem ;padding-right: 9rem;}
+    .main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .main-header h1 { font-size: 32px; color: var(--text-base); margin-bottom: 0; }
 
-    .btn-add:hover {
-        background-color: #d35400;
-    }
-
-    .product-grid {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 24px;
-        padding: 30px;
-        max-width: 1800px;
-        margin: 0 auto;
-    }
-
-    @media (max-width: 1600px) {
-        .product-grid {
-            grid-template-columns: repeat(4, 1fr);
-        }
-    }
-
-    @media (max-width: 1200px) {
-        .product-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-
-    @media (max-width: 900px) {
-        .product-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 600px) {
-        .product-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .card {
-        background-color: #fff;
-        border-radius: 16px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        overflow: hidden;
+    /* --- NEW LAYOUT: Order List --- */
+    .order-list-container {
         display: flex;
         flex-direction: column;
-        width: 300px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        cursor: pointer;
+        gap: 2rem;
     }
 
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    .order-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
     }
 
-    .card-image {
-        width: 100%;
-        height: 180px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #f5f5f5;
-        overflow: hidden;
-    }
-
-    .card-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .card-body {
-        padding: 16px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .card-title {
-        font-weight: bold;
-        font-size: 18px;
-        margin-bottom: 12px;
-        color: #2c3e50;
-    }
-
-    .card-info {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 8px 12px;
-        margin-bottom: 15px;
-    }
-
-    .card-info-label {
-        font-weight: bold;
-        color: #2c3e50;
-    }
-
-    .card-info-value {
-        color: #34495e;
-    }
-
-    .product-list {
-        margin: 5px 0;
-        padding-left: 20px;
-        max-height: 100px;
-        overflow-y: auto;
-    }
-
-    .product-list li {
-        margin-bottom: 4px;
-    }
-
-    .btn-group {
+    .order-header {
         display: flex;
         justify-content: space-between;
-        gap: 8px;
-        margin-top: 10px;
+        align-items: center;
+        padding: 20px 25px;
+        flex-wrap: wrap;
+        gap: 20px;
     }
 
-    .btn-sm {
+    .order-info-group {
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .info-item .label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+    }
+    .info-item .value {
+        font-weight: 600;
+        color: var(--text-base);
+    }
+    
+    .status-badge {
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+    .status-processing { color: var(--color-warning); }
+    .status-completed, .status-delivering { color: var(--color-success); }
+    .status-pending { color: var(--color-warning); }
+    .status-cancelled { color: var(--color-danger); }
+
+    .order-actions .btn {
         font-size: 14px;
-        padding: 6px 12px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        text-decoration: none;
-        text-align: center;
-    }
-
-    .btn-warning {
-        background-color: #f1c40f;
-        color: #2c3e50;
-    }
-
-    .btn-warning:hover {
-        background-color: #f39c12;
-    }
-
-    .btn-danger {
-        background-color: #e74c3c;
-        color: #fff;
-    }
-
-    .btn-danger:hover {
-        background-color: #c0392b;
-    }
-
-    .btn-detail {
-        background-color: #f1c40f;
-        color: #2c3e50;
-        padding: 6px 15px;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 14px;
-    }
-
-    .btn-detail:hover {
-        background-color: #f39c12;
-    }
-
-    .btn-reorder {
-        background-color: #27ae60;
-        color: white;
-        padding: 6px 15px;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 14px;
-        margin-left: 8px;
-    }
-
-    .btn-reorder:hover {
-        background-color: #229954;
-    }
-
-    .btn-review {
-        background-color: #3498db;
-        color: white;
-        padding: 6px 15px;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 14px;
-        margin-left: 8px;
-    }
-
-    .btn-review:hover {
-        background-color: #2980b9;
-    }
-
-    .alert {
-        max-width: 700px;
-        margin: 20px auto;
-        background-color: #d4edda;
-        color: #155724;
-        padding: 15px;
+        padding: 8px 16px;
         border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .btn-primary {
+        background-color: var(--text-important);
+        color: var(--bg-dark);
+    }
+    .btn-primary:hover {
+        opacity: 0.85;
+    }
+    
+    /* --- Daftar Item Produk --- */
+    .order-items-list {
+        padding: 25px;
+        border-top: 1px solid var(--border-color);
     }
 
-    .status-badge, .payment-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-
-    .status-pending {
-        background-color: #f1c40f;
-        color: #2c3e50;
-    }
-
-    .status-processing {
-        background-color: #3498db;
-        color: white;
-    }
-
-    .status-completed {
-        background-color: #2ecc71;
-        color: white;
-    }
-
-    .status-cancelled {
-        background-color: #e74c3c;
-        color: white;
-    }
-
-    .status-delivering {
-        background-color: #9b59b6;
-        color: white;
-    }
-
-    .status-unknown {
-        background-color: #95a5a6;
-        color: white;
-    }
-
-    .payment-success {
-        background-color: #2ecc71;
-        color: white;
-    }
-
-    .payment-failed {
-        background-color: #e74c3c;
-        color: white;
-    }
-
-    .payment-pending {
-        background-color: #f1c40f;
-        color: #2c3e50;
-    }
-
-    .payment-cancelled {
-        background-color: #95a5a6;
-        color: white;
-    }
-
-    .empty-state {
-        text-align: center;
-        margin-top: 40px;
-        color: #7f8c8d;
-    }
-
-    .cart-animation {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        z-index: 9999;
-        display: none;
-        text-align: center;
-    }
-
-    .cart-icon {
-        font-size: 48px;
-        margin-bottom: 10px;
-        animation: bounce 0.6s ease-in-out;
-    }
-
-    @keyframes bounce {
-        0%, 20%, 60%, 100% {
-            transform: translateY(0);
-        }
-        40% {
-            transform: translateY(-20px);
-        }
-        80% {
-            transform: translateY(-10px);
+    /* --- PERBAIKAN PADA PRODUCT ITEM --- */
+    .product-item {
+        display: flex;
+        align-items: flex-start; /* Mengubah ke flex-start agar tidak terpusat vertikal */
+        gap: 20px;
+        not(:last-child) {
+            margin-bottom: 25px;
         }
     }
+    .product-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
+        object-fit: cover;
+        background-color: var(--border-color);
+        flex-shrink: 0;
+    }
+    .product-info {
+        flex-grow: 1; /* Membuat bagian ini memanjang dan mendorong bagian kanan */
+    }
+    .product-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-base);
+        margin-bottom: 8px;
+    }
+    .product-details {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+    }
+    
+    .product-actions-price {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end; /* Membuat konten (harga & tombol) rata kanan */
+        flex-shrink: 0; /* Mencegah bagian ini menyusut */
+    }
+    .product-price {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-base);
+        margin-bottom: 12px; /* Jarak antara harga dan tombol 'Beli Lagi' */
+    }
+    .product-buy-again button {
+        color: var(--text-important);
+        text-decoration: none;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    /* State Kosong */
+    .empty-state { text-align: center; margin-top: 50px; color: var(--text-secondary); background: var(--card-bg); padding: 50px; border-radius: 12px; border: 1px dashed var(--border-color); }
+    .empty-state p { font-size: 18px; margin-bottom: 25px; }
+    .btn-add { background-color: var(--text-important); color: var(--bg-dark); padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; transition: background-color 0.3s ease; }
+    .btn-add:hover { opacity: 0.85; }
+
 </style>
 
-<div class="header-area">
-    <h1>Daftar Pesanan</h1>
-                    @if(auth()->check() && auth()->user()->is_admin)
-        <a href="{{ route('menus.create') }}" class="btn-add">Tambah Produk</a>
-@endif
-                </div>
+<div class="account-container">
+    
 
-@if(session('success'))
-    <div class="alert">{{ session('success') }}</div>
-@endif
-
-@if($orders->count() > 0)
-    <div class="product-grid">
-        @foreach($orders as $order)
-        <div class="card" onclick="window.location.href='{{ route('orders.show', $order->id) }}'">
-            <div class="card-image">
-                @php
-                    // Coba ambil menu dari item pertama
-                    $firstItem = $order->items->first();
-                    $menu = $firstItem ? $firstItem->menu : null;
-                    $menuImage = null;
-                    
-                    // Cek apakah menu memiliki images (JSON)
-                    if ($menu && $menu->images) {
-                        $images = json_decode($menu->images);
-                        if (is_array($images) && count($images) > 0) {
-                            $menuImage = $images[0]; // Ambil gambar pertama
-                        }
-                    }
-                    // Fallback ke image jika images tidak ada
-                    elseif ($menu && $menu->image) {
-                        $menuImage = $menu->image;
-                    }
-                @endphp
-
-                @if($menuImage)
-                    <img src="{{ asset('storage/'.$menuImage) }}" alt="Gambar Pesanan"
-                         onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180?text=Pesanan'">
-                @else
-                    <img src="https://via.placeholder.com/300x180?text=Pesanan" alt="Gambar Pesanan">
-                @endif
-            </div>
-
-            <div class="card-body">
-                <div class="card-title">Kode: {{ $order->order_code ?? 'N/A' }}</div>
-
-                <div class="card-info">
-                    <div class="card-info-label">Total Harga:</div>
-                    <div class="card-info-value">Rp {{ number_format($order->total_price ?? 0, 0, ',', '.') }}</div>
-
-                    <div class="card-info-label">Produk:</div>
-                    <div class="card-info-value">
-                        <ul class="product-list">
-                            @forelse($order->items as $item)
-                                <li>{{ $item->menu->name ?? 'Produk tidak tersedia' }} ({{ $item->quantity ?? 0 }}x)</li>
-                            @empty
-                                <li>Tidak ada produk</li>
-                            @endforelse
-                        </ul>
-                    </div>
-
-                    <div class="card-info-label">Status:</div>
-                    <div class="card-info-value">
-                        @php
-                            $statusClass = 'status-unknown';
-                            if($order->status == 'pending') $statusClass = 'status-pending';
-                            elseif($order->status == 'processing') $statusClass = 'status-processing';
-                            elseif($order->status == 'completed') $statusClass = 'status-completed';
-                            elseif($order->status == 'cancelled') $statusClass = 'status-cancelled';
-                            elseif($order->status == 'delivering') $statusClass = 'status-delivering';
-                        @endphp
-                        <span class="status-badge {{ $statusClass }}">
-                            {{ ucfirst($order->status ?? 'unknown') }}
-                        </span>
-                    </div>
-
-                    <div class="card-info-label">Pembayaran:</div>
-                    <div class="card-info-value">
-                        @php
-                            $paymentClass = 'payment-pending';
-                            $paymentText = 'Pending';
-                            
-                            if($order->payment_status == 'success') {
-                                $paymentClass = 'payment-success';
-                                $paymentText = 'Berhasil';
-                            } elseif($order->payment_status == 'failed') {
-                                $paymentClass = 'payment-failed';
-                                $paymentText = 'Gagal';
-                            } elseif($order->payment_status == 'cancelled') {
-                                $paymentClass = 'payment-cancelled';
-                                $paymentText = 'Dibatalkan';
-                            }
-                        @endphp
-                        <span class="payment-badge {{ $paymentClass }}">
-                            {{ $paymentText }}
-                        </span>
-                    </div>
-
-                    <div class="card-info-label">Tanggal:</div>
-                    <div class="card-info-value">{{ $order->created_at ? $order->created_at->format('d M Y H:i') : 'N/A' }}</div>
-                </div>
-
-                @if($order->payment_status == 'success')
-                <div style="text-align: center; margin-top: 5px;">
-                    @if(!auth()->user()->is_admin)
-                        @php
-                            // Ambil menu_id dari item pertama
-                            $firstItem = $order->items->first();
-                            $menuId = $firstItem ? $firstItem->menu_id : null;
-                        @endphp
-                        @if($menuId)
-                            <a href="{{ route('customer.reviews', ['menu_id' => $menuId]) }}" class="btn-review" onclick="event.stopPropagation()">Reviews</a>
-                        @endif
-                    @endif
-                    <button onclick="event.stopPropagation(); reorderWithAnimation({{ $order->id }})" class="btn-reorder">Beli Lagi</button>
-                </div>
-                @endif
-
-                @if(auth()->check() && auth()->user()->is_admin)
-                <div class="btn-group" style="margin-top: 10px;">
-                    <a href="{{ route('orders.edit', $order->id) }}" class="btn-sm btn-warning" onclick="event.stopPropagation()">Edit</a>
-                    <form action="{{ route('orders.destroy', $order->id) }}" method="POST" onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus pesanan ini?')" style="display: inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn-sm btn-danger" onclick="event.stopPropagation()">Hapus</button>
-                    </form>
-                </div>
-                @endif
-            </div>
-            </div>
+    {{-- Main Content (Order List) --}}
+    <main class="main-content" role="main">
+        <div class="main-header">
+            <h1>Riwayat Pesanan Anda</h1>
         </div>
-        @endforeach
-    </div>
-@else
-    <div class="empty-state">
-        <p>Belum ada pesanan.</p>
-        <a href="{{ route('menus.index') }}" class="btn-add">Mulai Belanja</a>
-    </div>
-@endif
 
-<!-- Cart Animation Overlay -->
-<div id="cartAnimation" class="cart-animation">
+        @if($orders->count() > 0)
+            <div class="order-list-container">
+                @foreach($orders as $order)
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-info-group">
+                            <div class="info-item">
+                                <div class="label">Order Number</div>
+                                <div class="value">#{{ $order->order_code }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Order Date</div>
+                                <div class="value">{{ $order->created_at->format('d M, Y') }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Total Amount</div>
+                                <div class="value">Rp {{ number_format($order->total_price, 0, ',', '.') }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Status</div>
+                                @php
+                                    $statusClass = '';
+                                    if ($order->status == 'processing') $statusClass = 'status-processing';
+                                    elseif ($order->status == 'completed') $statusClass = 'status-completed';
+                                    elseif ($order->status == 'delivering') $statusClass = 'status-delivering';
+                                    elseif ($order->status == 'cancelled') $statusClass = 'status-cancelled';
+                                    else $statusClass = 'status-pending';
+                                @endphp
+                                <div class="value"><span class="status-badge {{ $statusClass }}">{{ ucfirst($order->status) }}</span></div>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-primary">View Order</a>
+                        </div>
+                    </div>
+                    <div class="order-items-list">
+                        @foreach($order->items as $item)
+                        @php
+                            $menu = $item->menu;
+                            $menuImage = $menu && $menu->images ? (json_decode($menu->images)[0] ?? null) : ($menu->image ?? null);
+                        @endphp
+                        <div class="product-item mb-5">
+                            <img src="{{ $menuImage ? asset('storage/'.$menuImage) : 'https://via.placeholder.com/100x100?text=N/A' }}" 
+                                 alt="{{ $menu->name ?? 'Produk' }}" class="product-image"
+                                 onerror="this.src='https://via.placeholder.com/100x100?text=N/A'">
+                            
+                            {{-- BAGIAN KIRI: Informasi Produk --}}
+                            <div class="product-info">
+                                <div class="product-name">{{ $menu->name ?? 'Produk Tidak Tersedia' }}</div>
+                                <div class="product-description" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px;">
+                                    {{ $menu->description ?? 'Tidak ada deskripsi' }}
+                                </div>
+                                <div class="product-details">
+                                   Jumlah: {{ $item->quantity }}
+                                </div>
+                            </div>
+
+                            {{-- BAGIAN KANAN: Harga dan Tombol Aksi --}}
+                            <div class="product-actions-price">
+                                <div class="product-price">
+                                    Rp {{ number_format($item->quantity * $item->price, 0, ',', '.') }}
+                                </div>
+                                <div class="product-buy-again">
+                                     <button onclick="event.stopPropagation(); reorderWithAnimation({{ $order->id }})">Beli Lagi</button>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        @else
+            <div class="empty-state">
+                <p>Anda belum memiliki riwayat pesanan.</p>
+                <a href="{{ route('menus.index') }}" class="btn-add">Mulai Belanja Sekarang</a>
+            </div>
+        @endif
+    </main>
+</div>
+
+{{-- Script ini tetap diperlukan untuk fungsi "Beli Lagi" --}}
+<div id="cartAnimation" class="cart-animation" style="display: none;">
     <div class="cart-icon">🛒</div>
     <div>Menambahkan ke keranjang...</div>
 </div>
 
 <script>
 function reorderWithAnimation(orderId) {
-    // Show animation
+    event.preventDefault(); 
     document.getElementById('cartAnimation').style.display = 'block';
     
-    // Create form and submit
     const form = document.createElement('form');
     form.method = 'POST';
+    // Pastikan route reorder ini ada di web.php Anda
     form.action = `/orders/${orderId}/reorder`;
     
     const csrfToken = document.createElement('input');
@@ -493,7 +315,6 @@ function reorderWithAnimation(orderId) {
     form.appendChild(csrfToken);
     document.body.appendChild(form);
     
-    // Submit after animation delay
     setTimeout(() => {
         form.submit();
     }, 1500);
