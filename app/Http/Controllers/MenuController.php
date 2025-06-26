@@ -18,16 +18,21 @@ class MenuController extends Controller
     {
         $category = $request->query('kategori');
 
-        if ($category) {
-            $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->get();
-        } else {
-            $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->get();
-        }
-
         if (auth()->check() && auth()->user()->is_admin) {
+            // ADMIN: tampilkan semua produk tanpa paginasi
+            if ($category) {
+                $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->get();
+            } else {
+                $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->get();
+            }
             return view('admin.menu_admin', compact('menus'));
         } else {
-            // Perbaiki bagian ini: selalu kirim $category ke view
+            // USER: paginasi 9 per halaman
+            if ($category) {
+                $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->paginate(9);
+            } else {
+                $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->paginate(9);
+            }
             return view('menus.menu_user', [
                 'menus' => $menus,
                 'category' => $category // walaupun null, dikirim tetap
@@ -39,15 +44,19 @@ class MenuController extends Controller
     {
         $category = $request->query('kategori');
 
-        if ($category) {
-            $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->get();
-        } else {
-            $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->get();
-        }
-
         if (auth()->check() && auth()->user()->is_admin) {
+            if ($category) {
+                $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->get();
+            } else {
+                $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->get();
+            }
             return view('admin.menu_admin', compact('menus'));
         } else {
+            if ($category) {
+                $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->paginate(9);
+            } else {
+                $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->paginate(9);
+            }
             return view('menus.menu_user', [
                 'menus' => $menus,
                 'category' => $category
@@ -62,9 +71,22 @@ class MenuController extends Controller
             $query->with('user')->orderBy('created_at', 'desc');
         }]);
         
+        // Ambil data alamat user jika sudah login
+        $addresses = collect();
+        $defaultAddress = null;
+        $user = auth()->user();
+        
+        if ($user) {
+            $addresses = $user->addresses ?? collect();
+            $defaultAddress = $addresses->where('is_default', true)->first() ?? $addresses->first();
+        }
+        
         return view('menus.detail', [
             'menu' => $menu,
-            'isLoggedIn' => auth()->check()
+            'isLoggedIn' => auth()->check(),
+            'user' => $user,
+            'addresses' => $addresses,
+            'defaultAddress' => $defaultAddress
         ]);
     }
 

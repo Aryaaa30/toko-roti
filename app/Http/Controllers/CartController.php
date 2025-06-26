@@ -12,11 +12,13 @@ class CartController extends Controller
      */
     public function index()
     {
-        $carts = Cart::with('menu')
+        $carts = Cart::with(['menu', 'address'])
             ->where('user_id', auth()->id())
             ->get();
+        $addresses = auth()->user()->addresses ?? collect();
+        $defaultAddress = $addresses->where('is_default', true)->first() ?? $addresses->first();
 
-        return view('carts.cart', compact('carts'));
+        return view('carts.cart', compact('carts', 'addresses', 'defaultAddress'));
     }
 
     /**
@@ -27,11 +29,15 @@ class CartController extends Controller
         $request->validate([
             'menu_id' => 'required|exists:menus,id',
             'quantity' => 'nullable|integer|min:1',
+            'notes' => 'nullable|string',
+            'address_id' => 'nullable|exists:addresses,id',
         ]);
 
         $userId = auth()->id();
         $menuId = $request->menu_id;
         $quantity = $request->input('quantity', 1);
+        $notes = $request->input('notes');
+        $addressId = $request->input('address_id');
 
         $cart = Cart::where('user_id', $userId)
                     ->where('menu_id', $menuId)
@@ -40,6 +46,8 @@ class CartController extends Controller
         if ($cart) {
             // Jika sudah ada, tambahkan jumlah
             $cart->quantity += $quantity;
+            $cart->notes = $notes;
+            $cart->address_id = $addressId;
             $cart->save();
         } else {
             // Jika belum ada, buat entri baru
@@ -47,6 +55,8 @@ class CartController extends Controller
                 'user_id' => $userId,
                 'menu_id' => $menuId,
                 'quantity' => $quantity,
+                'notes' => $notes,
+                'address_id' => $addressId,
             ]);
         }
 

@@ -140,4 +140,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
+// Route untuk mengambil alamat user via AJAX
+Route::middleware('auth')->get('/user/addresses', [\App\Http\Controllers\AddressController::class, 'index'])->name('user.addresses');
+
+// Route untuk menyimpan alamat baru
+Route::middleware('auth')->post('/addresses', [\App\Http\Controllers\AddressController::class, 'store'])->name('addresses.store');
+
+// Route untuk menghapus alamat
+Route::middleware('auth')->delete('/addresses/{address}', [\App\Http\Controllers\AddressController::class, 'destroy'])->name('addresses.destroy');
+
 require __DIR__.'/auth.php';

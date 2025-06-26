@@ -16,13 +16,13 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #0a0a0a;
+            background-color:rgb(0, 0, 0);
             color: #ffffff;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1250px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -52,7 +52,7 @@
             gap: 40px;
             margin-bottom: 40px;
             padding: 30px;
-            background-color: #1a1a1a;
+            background-color: rgb(18,18,18);
             border-radius: 12px;
             border: 1px solid #333;
         }
@@ -154,7 +154,7 @@
         }
 
         .review-card {
-            background-color: #1a1a1a;
+                  background-color: rgb(18,18,18);
             border: 1px solid #333;
             border-radius: 12px;
             padding: 25px;

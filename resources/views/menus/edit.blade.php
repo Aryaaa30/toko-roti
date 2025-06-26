@@ -1,244 +1,260 @@
+
+@extends('layouts.app')
+
+@section('content')
+
 <style>
-    /* CSS sama persis seperti di create.blade */
+    :root {
+        --bg-dark: rgb(0, 0, 0);
+        --card-bg: rgb(18, 18, 18);
+        /* Warna background untuk input */
+        --placeholder: rgb(25, 25, 25); 
+        --border-color: rgb(40, 40, 40);
+        --text-base: rgb(245, 245, 245);
+        --text-important: rgb(254, 198, 228); /* Pastel Pink */
+        --text-secondary: #909090; /* Warna untuk teks placeholder agar kontras */
+        --text-white: #ffffff;
+        --danger-color: #e74c3c;
+    }
+
     body {
-        background-color: rgb(0, 0, 0);
-        font-family: 'Segoe UI', sans-serif;
+        background-color: var(--bg-dark);
+        font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        color: var(--text-base);
     }
 
+    /* --- Form Container & Header --- */
     .form-container {
-        max-width: 800px;
+        max-width: 1230px;
         margin: 40px auto;
-        padding: 30px;
-        background-color: #fff;
+        padding: 30px 40px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
-    .form-title {
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-header .form-title {
         font-size: 28px;
         font-weight: 700;
-        color: rgb(254, 198, 228); /* Pink */
-        margin-bottom: 10px;
-        text-align: center;
-        padding-bottom: 0;
-        border-bottom: none;
+        color: var(--text-important);
+        margin-bottom: 5px;
     }
 
-    .form-subtitle {
+    .form-header .form-subtitle {
         font-size: 16px;
-        color: #fff;
-        text-align: center;
-        margin-bottom: 28px;
-        font-weight: 700; /* Bold */
-        letter-spacing: 0.5px;
+        color: var(--text-secondary);
     }
 
+    /* --- Form Elements --- */
     .form-section {
-        margin-bottom: 25px;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
+        margin-bottom: 20px;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
     }
 
     .form-label {
         font-weight: 600;
-        color: #2c3e50;
+        color: var(--text-base);
         margin-bottom: 8px;
         display: block;
+        font-size: 15px;
     }
 
     .required-label::after {
         content: ' *';
-        color: #e74c3c;
+        color: var(--text-important);
     }
 
-    /* Enhanced Input Styling */
     .form-control {
-        border-radius: 8px;
+        width: 100%;
         padding: 12px 15px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        /* DIGANTI: Menggunakan var(--placeholder) untuk background */
+        background-color: var(--placeholder);
+        color: var(--text-base);
         font-size: 15px;
-        border: 1px solid #f5c6cb;
-        background-color: rgb(245, 245, 245);
-        transition: all 0.3s;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    /* DIGANTI: Warna teks placeholder diubah agar kontras dengan background baru */
+    .form-control::placeholder {
+        color: var(--text-secondary);
+        opacity: 1; 
+    }
+    .form-control::-moz-placeholder { /* Firefox */
+        color: var(--text-secondary);
+        opacity: 1;
+    }
+    .form-control:-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: var(--text-secondary);
+    }
+    .form-control::-ms-input-placeholder { /* Microsoft Edge */
+        color: var(--text-secondary);
+    }
+    
+    .form-control option {
+        /* Pilihan dropdown tetap gelap agar konsisten */
+        background-color: var(--placeholder);
+        color: var(--text-base);
     }
 
     .form-control:focus {
-        border-color: #f783ac;
-        box-shadow: 0 0 0 0.2rem rgba(254, 198, 228, 0.3);
-        background-color: white;
+        outline: none;
+        border-color: var(--text-important);
+        background-color: var(--bg-dark); /* Background sedikit lebih gelap saat fokus */
+        box-shadow: 0 0 0 3px rgba(254, 198, 228, 0.15);
     }
-
-    .form-control:hover {
-        background-color: white;
-        border-color: #f783ac;
-    }
-
-    /* Hapus icon centang pada select (kategori & status produk) */
-    select.form-control {
-        background-image: none !important;
-    }
-
-    .invalid-feedback, .text-danger {
-        font-size: 13px;
-        color: #e74c3c;
-        margin-top: 5px;
-    }
-
-    .btn-group, .d-flex.justify-content-between {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-    }
-
-    .btn {
-        padding: 10px 25px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 15px;
-        transition: all 0.3s;
-        border: none;
-    }
-
-    .btn-primary {
-        background-color: #f783ac;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background-color: #f06595;
-        transform: translateY(-1px);
-    }
-
-    .btn-outline-secondary {
-        background-color: rgb(245, 245, 245);
-        color: #6c757d;
-        border: 1px solid #dee2e6;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: white;
-        color: #495057;
-        border-color: #adb5bd;
-    }
-
-    .alert {
-        color: #721c24;
-        background-color: #f8d7da;
-        border: 1px solid #f5c6cb;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 25px;
-        font-size: 14px;
-    }
-
-    .alert ul {
-        margin-bottom: 0;
-        padding-left: 20px;
-    }
-
-    .form-row, .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    @media (max-width: 768px) {
-        .form-row, .form-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .image-preview-container, .current-images {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-top: 15px;
-    }
-
-    .preview-item, .image-item {
-        position: relative;
-        width: 120px;
-        height: 120px;
-        transition: all 0.3s;
-    }
-
-    .preview-item:hover, .image-item:hover {
-        transform: scale(1.03);
-    }
-
-    .image-preview, .image-item img {
-        width: 100%;
-        height: 100%;
-        border-radius: 8px;
-        object-fit: cover;
-        border: 1px solid #f5c6cb;
-        background-color: rgb(245, 245, 245);
-    }
-
-    .remove-image {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        width: 24px;
-        height: 24px;
-        background-color: rgba(247, 131, 172, 0.9);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        font-size: 12px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
-
-    .remove-image:hover {
-        background-color: rgba(240, 101, 149, 1);
-        transform: scale(1.1);
-    }
-
-    input[type="file"] {
-        cursor: pointer;
-        display: block;
-        margin-bottom: 6px;
-    }
-
-    input[type="file"]::file-selector-button {
-        padding: 8px 12px;
-        border-radius: 4px;
-        background-color: rgb(254, 198, 228);
-        border: none;
-        color: #495057;
-        font-weight: 500;
-        margin-right: 10px;
-        transition: all 0.2s;
-    }
-
-    input[type="file"]::file-selector-button:hover {
-        background-color: rgb(252, 177, 218);
-    }
-
-    .file-info, .text-muted {
-        display: block;
-        margin-left: 0;
-        margin-top: 2px;
-        color: #888;
-        font-size: 0.97em;
+    
+    .form-control.is-invalid {
+        border-color: var(--danger-color);
     }
 
     textarea.form-control {
         min-height: 120px;
         resize: vertical;
     }
+
+    .invalid-feedback {
+        color: var(--danger-color);
+        font-size: 13px;
+        margin-top: 6px;
+    }
+    
+    /* --- Image Upload & Preview --- */
+    .file-info {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-top: 8px;
+    }
+
+    .current-images, .image-preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 15px;
+        padding: 15px;
+        background-color: var(--placeholder);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        min-height: 100px;
+    }
+
+    .image-item, .preview-item {
+        position: relative;
+        width: 100px;
+        height: 100px;
+    }
+
+    .image-item img, .preview-item .image-preview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+    
+    .remove-image {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 24px;
+        height: 24px;
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+        transition: transform 0.2s;
+    }
+    .remove-image:hover {
+        transform: scale(1.1);
+    }
+
+    /* --- Action Buttons --- */
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn-action {
+        padding: 10px 25px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 6px;
+        text-align: center;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-update {
+        background-color: var(--text-important);
+        color: var(--bg-dark);
+    }
+    .btn-update:hover {
+        background-color: var(--text-white);
+        color: var(--bg-dark);
+    }
+
+    .btn-cancel {
+        background-color: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+    }
+    .btn-cancel:hover {
+        background-color: var(--border-color);
+        color: var(--text-white);
+    }
+    
+    .alert {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid var(--danger-color);
+        color: var(--text-base);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+    .alert ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .form-container {
+            padding: 20px;
+        }
+    }
 </style>
 
 <div class="form-container">
-    <h2 class="form-title">Edit Produk Roti</h2>
-    <p class="form-subtitle">Perbarui informasi produk roti Anda di sini.</p>
+    <div class="form-header">
+        <h2 class="form-title">Edit Produk Roti</h2>
+        <p class="form-subtitle">Perbarui informasi produk roti Anda di sini.</p>
+    </div>
 
     @if ($errors->any())
         <div class="alert">
@@ -255,12 +271,10 @@
         @csrf
         @method('PUT')
 
-        <div class="form-row">
+        <div class="form-grid">
             <div class="form-section">
                 <label for="name" class="form-label required-label">Nama Produk</label>
-                <input type="text" name="name" id="name"
-                    class="form-control @error('name') is-invalid @enderror"
-                    value="{{ old('name', $menu->name) }}" required>
+                <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $menu->name) }}" placeholder="Contoh: Roti Coklat Keju" required>
                 @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -268,16 +282,14 @@
 
             <div class="form-section">
                 <label for="price" class="form-label required-label">Harga (Rp)</label>
-                <input type="number" name="price" id="price" min="0" step="100"
-                    class="form-control @error('price') is-invalid @enderror"
-                    value="{{ old('price', $menu->price) }}" required>
+                <input type="number" name="price" id="price" min="0" step="100" class="form-control @error('price') is-invalid @enderror" value="{{ old('price', $menu->price) }}" placeholder="Contoh: 15000" required>
                 @error('price')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
         </div>
 
-        <div class="form-row">
+        <div class="form-grid">
             <div class="form-section">
                 <label for="kategori" class="form-label required-label">Kategori Produk</label>
                 <select name="kategori" id="kategori" class="form-control @error('kategori') is-invalid @enderror" required>
@@ -295,9 +307,7 @@
 
             <div class="form-section">
                 <label for="stok" class="form-label required-label">Stok Produk</label>
-                <input type="number" name="stok" id="stok" min="0"
-                    class="form-control @error('stok') is-invalid @enderror"
-                    value="{{ old('stok', $menu->stok) }}" required>
+                <input type="number" name="stok" id="stok" min="0" class="form-control @error('stok') is-invalid @enderror" value="{{ old('stok', $menu->stok) }}" placeholder="Contoh: 50" required>
                 @error('stok')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -306,18 +316,17 @@
 
         <div class="form-section">
             <label for="description" class="form-label required-label">Deskripsi Produk</label>
-            <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror"
-                required>{{ old('description', $menu->description) }}</textarea>
+            <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" placeholder="Masukkan deskripsi singkat mengenai produk di sini..." required>{{ old('description', $menu->description) }}</textarea>
             @error('description')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
-        <div class="form-row">
-            <div class="form-section">
+        <div class="form-grid">
+             <div class="form-section">
                 <label for="available" class="form-label required-label">Status Produk</label>
                 <select name="available" id="available" class="form-control @error('available') is-invalid @enderror" required>
-                    <option value="">-- Pilih Status --</option>
+                    <option value="" disabled>-- Pilih Status --</option>
                     <option value="1" {{ old('available', $menu->available) == '1' ? 'selected' : '' }}>Tersedia</option>
                     <option value="0" {{ old('available', $menu->available) == '0' ? 'selected' : '' }}>Tidak Tersedia</option>
                 </select>
@@ -327,89 +336,81 @@
             </div>
 
             <div class="form-section">
-                <label for="images" class="form-label">Gambar Produk</label>
+                <label for="images" class="form-label">Gambar Produk Baru</label>
                 <input type="file" name="images[]" id="images" class="form-control" accept="image/*" multiple>
                 @error('images.*')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
                 @enderror
-                <small class="file-info">Format: JPG, PNG, GIF (Maks. 2MB per gambar)</small>
-                <div class="image-preview-container" id="imagePreviewContainer"></div>
-                @if ($menu->images)
-                    <div class="current-images">
-                        @foreach(json_decode($menu->images) as $index => $image)
-                            <div class="image-item">
-                                <img src="{{ asset('storage/' . $image) }}" alt="{{ $menu->name }} image {{ $index + 1 }}">
-                            </div>
-                        @endforeach
-                    </div>
-                    <span class="file-info">Unggah gambar baru akan menggantikan semua gambar di atas</span>
-                @elseif ($menu->image)
-                    <div class="current-images">
-                        <div class="image-item">
-                            <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}">
-                        </div>
-                    </div>
-                    <span class="file-info">Unggah gambar baru akan menggantikan gambar di atas</span>
-                @endif
+                <p class="file-info">Unggah gambar baru akan menggantikan semua gambar saat ini.</p>
             </div>
         </div>
-
-        <div class="btn-group">
-            <a href="{{ route('menus.index') }}" class="btn btn-outline-secondary">Batal</a>
-            <button type="submit" class="btn btn-primary">Update Produk</button>
+        
+        <div class="form-section">
+             <label class="form-label">Gambar Produk</label>
+             <div id="imagePreviewContainer" class="image-preview-container" style="display: none;"></div>
+             @if (($menu->images && !empty(json_decode($menu->images))) || $menu->image)
+                 <div class="current-images" id="currentImagesContainer">
+                    @php
+                        $images = $menu->images ? json_decode($menu->images) : ($menu->image ? [$menu->image] : []);
+                    @endphp
+                    @foreach($images as $image)
+                        @if($image)
+                        <div class="image-item">
+                            <img src="{{ asset('storage/' . $image) }}" alt="Current image">
+                        </div>
+                        @endif
+                    @endforeach
+                 </div>
+             @else
+                <div class="current-images" id="currentImagesContainer">
+                    <p class="file-info" style="width: 100%; text-align: center;">Belum ada gambar untuk produk ini.</p>
+                </div>
+             @endif
+        </div>
+        
+        <div class="form-actions">
+            <a href="{{ route('menus.index') }}" class="btn-action btn-cancel">Batal</a>
+            <button type="submit" class="btn-action btn-update">Update Produk</button>
         </div>
     </form>
 </div>
 
 <script>
-    // Script untuk preview multiple images
     document.getElementById('images').addEventListener('change', function(event) {
-        const container = document.getElementById('imagePreviewContainer');
-        container.innerHTML = ''; // Clear previous previews
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const currentContainer = document.getElementById('currentImagesContainer');
+        previewContainer.innerHTML = ''; // Clear previous previews
 
         const files = event.target.files;
         if (files.length > 0) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+            // Hide current images and show the preview container for new ones
+            if(currentContainer) currentContainer.style.display = 'none';
+            previewContainer.style.display = 'flex';
 
-                // Validate file type
-                if (!file.type.match('image.*')) {
-                    continue;
-                }
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) continue;
 
-                // Create preview item container
                 const previewItem = document.createElement('div');
                 previewItem.className = 'preview-item';
 
-                // Create image element
                 const img = document.createElement('img');
                 img.className = 'image-preview';
-                img.file = file;
-                previewItem.appendChild(img);
-
-                // Add remove button (optional)
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'remove-image';
-                removeBtn.textContent = '×';
-                removeBtn.setAttribute('type', 'button');
-                removeBtn.addEventListener('click', function() {
-                    previewItem.remove();
-                    // Note: This doesn't actually remove the file from the inputs doesn't actually remove the file from the input
-                    // You'll need additional logic for that logic for that
-                });                });
-                previewItem.appendChild(removeBtn);tn);
-
-                container.appendChild(previewItem);
-
-                // Read and display the image
+                
                 const reader = new FileReader();
-                reader.onload = (function(aImg) {(aImg) {
-                    return function(e) {
-                        aImg.src = e.target.result;
-                    }; };
-                })(img);
-                reader.readAsDataURL(file);                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+
+                previewItem.appendChild(img);
+                previewContainer.appendChild(previewItem);
             }
-        }        }
+        } else {
+            // If no files are selected, show the current images again
+            if(currentContainer) currentContainer.style.display = 'flex';
+            previewContainer.style.display = 'none';
+        }
     });
 </script>
+
+@endsection

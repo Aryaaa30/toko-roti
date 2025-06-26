@@ -160,7 +160,7 @@
 <!-- About Section -->
 
 <section class="about-section section" id="about" style="background-color: #000; color: rgb(245, 245, 245); padding: 40px 0;">
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <div class="container" style="max-width: 1250px; margin: 0 auto; padding: 0 20px;">
         <div class="about-grid" style="display: flex; flex-wrap: wrap; gap: 40px; align-items: center;">
             <div class="about-content" style="flex: 1 1 400px; min-width: 280px;">
                 <h2 style="font-weight: 500; font-size: 2.5rem; margin-bottom: 20px; color:rgb(254, 198, 228)">Tentang Kami</h2>
@@ -195,7 +195,7 @@
 <!-- Menu Section -->
 <!-- Menu Section -->
 <section class="menu-section section" id="menu" style="background-color: #000; color: rgb(245, 245, 245); padding: 40px 0;">
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <div class="container" style="max-width: 1250px; margin: 0 auto; padding: 0 20px;">
         <div class="text-center" style="margin-bottom: 40px;">
             <h2 style="font-weight: 500; font-size: 2.5rem; margin-bottom: 20px; color: rgb(254, 198, 228);">Menu Favorit Kami</h2>
             <p style="font-weight: 300; font-size: 1.1rem; line-height: 1.6; margin-bottom: 0;">
@@ -457,7 +457,7 @@
 
 
 <section style="background-color:#000; color:#f5f5f5; padding:40px 0;">
-  <div style="max-width:1200px; margin:0 auto; padding:0 20px; text-align:center;">
+  <div style="max-width:1250px; margin:0 auto; padding:0 20px; text-align:center;">
     <h2 style="font-weight:500; font-size:2.5rem; color:#fec6e4; margin-bottom:30px;">Apa Kata Pelanggan Kami</h2>
 
     <div id="testimonial-carousel" style="display:flex; justify-content:center; gap:20px; max-width:1000px; margin:0 auto;">
@@ -501,11 +501,11 @@
 
     <!-- Foto profil kecil bulat di bawah sebagai navigasi -->
     <div style="display:flex; justify-content:center; gap: 30px; margin-top: 40px;">
-      <img class="profile-thumb" data-index="0" src="https://i.pravatar.cc/80?u=1" alt="Sari Andini" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
-      <img class="profile-thumb" data-index="1" src="https://i.pravatar.cc/80?u=2" alt="Budi Wijaya" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
-      <img class="profile-thumb" data-index="2" src="https://i.pravatar.cc/80?u=3" alt="Lisa Melati" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
-      <img class="profile-thumb" data-index="3" src="https://i.pravatar.cc/80?u=4" alt="Dewi Kartika" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
-      <img class="profile-thumb" data-index="4" src="https://i.pravatar.cc/80?u=5" alt="Rian Saputra" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
+<img class="profile-thumb" data-index="0" src="https://imgsrv2.voi.id/yG6vcg6AG13ggkH8070FURA2hjbcJ66CY9V62xIwKNI/auto/1200/675/sm/1/bG9jYWw6Ly8vcHVibGlzaGVycy8yNTU0NzYvMjAyMzAyMTcxNTQ2LW1vYmlsZS5jcm9wcGVkXzE2NzY2MjM1NjYuanBlZw.jpg" alt="Ahmad Dhani" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
+<img class="profile-thumb" data-index="1" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjUEz0SfB7EdBwPrVgtP6_PALI9IP6lNEHRufSo0TsuBuWKrvij99MHql-G4SJVuQ_QAihNEdYBTHbOQJ6TL__1BufmYBPzlnJ8TGy7x7pt8I9jud84sVn8BrrnIrzQ7EYSlF_mfJp8FiU/s1600/Andra+Junaidi+Ramadhan+Guitarist.jpg" alt="Andra Ramadhan" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
+<img class="profile-thumb" data-index="2" src="https://i.scdn.co/image/ab67616d0000b273647966c90c59b802d4066633" alt="Ari Lasso" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
+<img class="profile-thumb" data-index="3" src="https://tabloidseleberita.com/wp-content/uploads/2023/06/Screenshot_2023-06-29-09-53-05-358-edit_com.miui_.gallery.jpg" alt="Once Mekel" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
+<img class="profile-thumb" data-index="4" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj_Igxy4i9JWoh6C13p_vim4CoHu8R61Gkyv3GLgPMXngCLlLEXGRJCIC1Tk_b8KRAqpv9fuHEYtmgB9WJu7wLLrhHeM31cRLSI-gvqkDmoyLJb75m-IwUbl17oxY60NyZP-8hcpX06_7BM/s1600/yuke.jpg" alt="Yuke Sampurna" style="width:70px; height:70px; border-radius:50%; object-fit:cover; cursor:pointer; border: 2px solid transparent; transition: border-color 0.3s;">
     </div>
   </div>
 </section>
@@ -513,37 +513,37 @@
 <script>
   const testimonials = [
     {
-      photo: "https://i.pravatar.cc/150?u=1",
-      name: "Sari Andini",
-      position: "Pelanggan Setia",
+      photo: "https://asset.kompas.com/crops/uJeLqBknUcpvnLaXRoc4QFSsfFM=/0x0:0x0/1200x800/data/photo/2022/09/30/63365f44e9708.jpg",
+      name: "Ahmad Dhani",
+      position: "Keyboardist",
       rating: "★★★★☆",
       desc: "Rotinya selalu segar dan rasanya luar biasa! Sudah langganan di sini lebih dari 2 tahun dan tidak pernah kecewa."
     },
     {
-      photo: "https://i.pravatar.cc/150?u=2",
-      name: "Budi Wijaya",
-      position: "Pelanggan Reguler",
+      photo: "https://img.okezone.com/content/2023/03/02/205/2774397/10-lagu-yang-ternyata-ciptaan-andra-junaidi-ramadhan-MRCoDLsXgr.jpg",
+      name: "Andra Ramadhan",
+      position: "Guitarist",
       rating: "★★★★★",
       desc: "Pelayanannya ramah dan rotinya enak-enak. Harganya juga masih terjangkau. Recommended banget!"
     },
     {
-      photo: "https://i.pravatar.cc/150?u=3",
-      name: "Lisa Melati",
-      position: "Pecinta Roti",
+      photo: "https://cdn1-production-images-kly.akamaized.net/NRmNJL16OzbRbWVg3YXvxe2rFIc=/800x1066/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/2744393/original/056088800_1551843777-20190306-Ari-Lasso-4.jpg",
+      name: "Ari Lasso",
+      position: "Vocalist",
       rating: "★★★★☆",
       desc: "Roti coklat keju favoritku! Setiap pagi selalu beli di sini sebelum kerja. Mantap!"
     },
     {
-      photo: "https://i.pravatar.cc/150?u=4",
-      name: "Dewi Kartika",
-      position: "Pelanggan Baru",
+      photo: "https://micms.mediaindonesia.com/storage/app/media/FOTO/Operator/16-Once.jpg",
+      name: "Once Mekel",
+      position: "Vocalist",
       rating: "★★★★★",
       desc: "Sangat puas dengan kualitas dan pelayanan."
     },
     {
-      photo: "https://i.pravatar.cc/150?u=5",
-      name: "Rian Saputra",
-      position: "Pelanggan Lama",
+      photo: "https://cdn.antaranews.com/cache/1200x800/2025/06/07/WhatsApp-Image-2025-06-07-at-11.34.41.jpeg",
+      name: "Yuke Sampurna",
+      position: "Bassist",
       rating: "★★★★☆",
       desc: "Roti selalu fresh dan enak, recommended!"
     }
@@ -637,7 +637,7 @@
 
 
 <section id="contact" style="background-color:#000; color:#f5f5f5; padding:50px 20px; font-family: Arial, sans-serif;">
-  <div class="container" style="max-width:1200px; margin:0 auto; display:flex; flex-wrap: wrap; gap:40px;">
+  <div class="container" style="max-width:1250px; margin:0 auto; display:flex; flex-wrap: wrap; gap:40px;">
 
     <!-- Kiri -->
     <div style="flex:1 1 400px; min-width:280px; display:flex; flex-direction: column; gap:30px;">
@@ -721,7 +721,7 @@
   </div>
 
   <!-- Peta full width di bawah -->
-  <div style="max-width:1200px; margin:40px auto 0; border-radius:10px; overflow:hidden; height:350px; box-shadow: 0 0 15px rgba(254,198,228,0.3);">
+  <div style="max-width:1250px; margin:40px auto 0; border-radius:10px; overflow:hidden; height:350px; box-shadow: 0 0 15px rgba(254,198,228,0.3);">
     <!-- OpenStreetMap embed -->
     <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
       src="https://www.openstreetmap.org/export/embed.html?bbox=110.3605%2C-7.8005%2C110.3705%2C-7.7905&amp;layer=mapnik"
