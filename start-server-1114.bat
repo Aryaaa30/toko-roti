@@ -1,3 +1,0 @@
-@echo off
-echo Starting Laravel server on port 1114...
-php artisan serve --port=1114
