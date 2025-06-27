@@ -248,13 +248,24 @@
     <div class="product-item">
         <div class="item-image">
             <div class="image-carousel" id="carousel-{{ $menu->id }}">
-                @if($menu->images && count(json_decode($menu->images)) > 0)
+                @php
+                    $images = [];
+                    if ($menu->images) {
+                        $decoded = json_decode($menu->images, true);
+                        if (is_array($decoded) && count($decoded) > 0) {
+                            $images = $decoded;
+                        }
+                    }
+                @endphp
+                
+                @if(count($images) > 0)
                     <div class="carousel-inner">
-                        @php $images = json_decode($menu->images); @endphp
                         @foreach($images as $index => $imagePath)
-                            <div class="carousel-item" data-index="{{ $index }}">
-                                <img src="{{ asset('storage/'.$imagePath) }}" alt="{{ $menu->name }} image {{ $index + 1 }}">
-                            </div>
+                            @if($imagePath && !empty(trim($imagePath)))
+                                <div class="carousel-item" data-index="{{ $index }}">
+                                    <img src="{{ asset('storage/'.$imagePath) }}" alt="..." onerror="this.src='https://via.placeholder.com/150x150?text=Image+Error'">
+                                </div>
+                            @endif
                         @endforeach
                     </div>
                     @if(count($images) > 1)
@@ -263,7 +274,9 @@
                     @endif
                 @elseif($menu->image)
                     <div class="card-img-container">
-                        <img src="{{ asset('storage/'.$menu->image) }}" alt="{{ $menu->name }}">
+                        <img src="{{ asset('storage/'.$menu->image) }}" 
+                             alt="{{ $menu->name }}"
+                             onerror="this.src='https://via.placeholder.com/150x150?text=Image+Error'">
                     </div>
                 @else
                     <div class="card-img-container">

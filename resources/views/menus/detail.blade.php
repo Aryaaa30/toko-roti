@@ -899,15 +899,25 @@ hr {
             </div>
           @else
             <div style="color: rgb(254, 198, 228); font-size: 14px; margin-bottom: 8px;">Anda belum memiliki alamat pengiriman.</div>
-            <button type="button" id="openAddressModal" class="btn-primary" style="background:transparent; color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); text-align:center; padding:10px 0; display:block;">Tambah Alamat</button>
+            @if(auth()->check())
+              <button type="button" id="openAddressModal" class="btn-primary" style="background:transparent; color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); text-align:center; padding:10px 0; display:block;">Tambah Alamat</button>
+            @else
+              <a href="{{ route('login') }}?redirect={{ urlencode(request()->url()) }}" class="btn-primary" style="background:transparent; color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); text-align:center; padding:10px 0; display:block; text-decoration:none;">Tambah Alamat</a>
+            @endif
           @endif
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-                  <button type="button" id="openAddressModal" class="btn-primary" style="background:transparent; background-color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); font-size:13px; font-weight:700; padding:6px 16px; border-radius:8px; cursor:pointer;">Tambah Alamat</button>
-                  <button type="button" id="deleteAddressBtn" class="btn-primary" style="background:transparent; color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); font-size:14px; font-weight:700; padding:6px 18px; border-radius:8px; cursor:pointer; margin-left:4px;" title="Hapus alamat terpilih">
-                    Delete
-                  </button>
-                </div>
+          @if(auth()->check())
+            <button type="button" id="openAddressModal" class="btn-primary" style="background:transparent; background-color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); font-size:13px; font-weight:700; padding:6px 16px; border-radius:8px; cursor:pointer;">Tambah Alamat</button>
+            @if(count($addresses) > 0)
+              <button type="button" id="deleteAddressBtn" class="btn-primary" style="background:transparent; color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); font-size:14px; font-weight:700; padding:6px 18px; border-radius:8px; cursor:pointer; margin-left:4px;" title="Hapus alamat terpilih">
+                Delete
+              </button>
+            @endif
+          @else
+            <a href="{{ route('login') }}?redirect={{ urlencode(request()->url()) }}" class="btn-primary" style="background:transparent; background-color:rgb(254,198,228); border:1.5px solid rgb(254,198,228); font-size:13px; font-weight:700; padding:6px 16px; border-radius:8px; cursor:pointer; text-decoration:none;">Tambah Alamat</a>
+          @endif
+        </div>
       </div>
 
       <div class="subtotal-row">
