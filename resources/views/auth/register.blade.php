@@ -1,366 +1,331 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Create Account Modal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet" />
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Open Sans', sans-serif;
-      background: #00000080;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+@extends('layouts.app')
+
+@section('content')
+
+<style>
+    /* Saran: Pindahkan style global seperti :root dan style umum lainnya 
+      ke file CSS utama Anda (misal: app.css) untuk best practice.
+    */
+    :root {
+        --bg-dark: rgb(0, 0, 0);
+        --card-bg: rgb(18, 18, 18);
+        --placeholder-bg: rgb(25, 25, 25);
+        --border-color: rgb(40, 40, 40);
+        --text-base: rgb(245, 245, 245);
+        --text-important: rgb(254, 198, 228);
+        --text-secondary: #909090;
+        --text-white: #ffffff;
+        --danger-color: #e74c3c;
+        --success-color: #2ecc71;
     }
-    .modal {
-      background: #fff;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 420px;
-      padding: 32px 32px 40px 32px;
-      position: relative;
-      box-shadow: 0 0 15px rgb(0 0 0 / 0.3);
+
+    .auth-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        min-height: calc(100vh - 80px); /* Adjust 80px based on your nav height */
+        padding: 40px 20px;
+        box-sizing: border-box;
     }
-    .close-btn {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      font-size: 24px;
-      font-weight: 700;
-      line-height: 1;
-      color: #000;
-      cursor: pointer;
-      border: none;
-      background: transparent;
+
+    .form-container {
+        width: 100%;
+        max-width: 800px; /* Lebarkan container untuk layout 2 kolom */
+        padding: 30px 40px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
     }
-    h2 {
-      font-weight: 700;
-      font-size: 20px;
-      line-height: 1.2;
-      text-align: center;
-      margin: 0 0 32px 0;
-      color: #222222;
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
     }
-    form {
-      width: 100%;
+
+    .form-header .form-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-important);
+        margin-bottom: 5px;
     }
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      border: 1.5px solid #222222;
-      border-radius: 6px;
-      padding: 12px 16px;
-      font-size: 16px;
-      font-weight: 400;
-      color: #222222;
-      margin-bottom: 16px;
-      outline-offset: 2px;
+
+    .form-header .form-subtitle {
+        font-size: 16px;
+        color: var(--text-secondary);
     }
-    input::placeholder { color: #222222; }
-    .error {
-      color: red;
-      font-size: 14px;
-      margin-top: -10px;
-      margin-bottom: 12px;
+
+    /* Kunci dari layout 2 kolom */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Dua kolom dengan lebar sama */
+        gap: 25px; /* Jarak antar kolom */
+        margin-bottom: 20px;
     }
+
+    .form-section {
+        /* Hapus margin-bottom dari sini karena sudah dihandle oleh .form-grid */
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-base);
+        margin-bottom: 8px;
+        display: block;
+        font-size: 15px;
+    }
+
+    .required-label::after {
+        content: ' *';
+        color: var(--text-important);
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background-color: var(--placeholder-bg);
+        color: var(--text-base);
+        font-size: 15px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .form-control::placeholder { color: var(--text-secondary); opacity: 1; }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--text-important);
+        background-color: var(--bg-dark);
+        box-shadow: 0 0 0 3px rgba(254, 198, 228, 0.15);
+    }
+
+    .invalid-feedback {
+        color: var(--danger-color);
+        font-size: 13px;
+        margin-top: 6px;
+        display: block;
+    }
+    
+    .password-toggle-icon {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    input[type="password"].form-control { padding-right: 45px; }
+
     .password-info {
-      font-size: 14px;
-      color: #444444;
-      margin: 0 0 8px 0;
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin: 0 0 8px 0; /* Sesuaikan margin */
     }
+
     ul.password-reqs {
-      margin: 0 0 24px 20px;
-      padding: 0;
-      list-style-type: disc;
-      color: #ff2a2a;
-      font-size: 14px;
-      line-height: 1.3;
+        margin: 0 0 24px 20px;
+        padding: 0;
+        list-style-type: disc;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--danger-color);
     }
+    ul.password-reqs li.valid { color: var(--success-color); }
+
     .checkbox-container {
       display: flex;
       align-items: flex-start;
       gap: 12px;
+      margin-top: 10px;
       margin-bottom: 24px;
+      padding: 12px;
+      background-color: var(--placeholder-bg);
+      border-radius: 8px;
     }
     .checkbox-container input[type="checkbox"] {
       margin-top: 3px;
       width: 18px;
       height: 18px;
       cursor: pointer;
+      flex-shrink: 0;
     }
     .checkbox-container label {
       font-size: 14px;
       line-height: 1.4;
-      color: #444444;
+      color: var(--text-secondary);
       user-select: none;
     }
-    button.signup-btn {
-      width: 100%;
-      background-color: #1a1616;
-      color: #f5e9db;
-      font-weight: 600;
-      font-size: 18px;
-      padding: 14px 0;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+
+    .form-actions {
+        margin-top: 30px;
     }
-    button.signup-btn:hover,
-    button.signup-btn:focus {
-      background-color: #3a3535;
-      outline: none;
+
+    .btn-action {
+        width: 100%;
+        padding: 12px 25px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 6px;
+        text-align: center;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
     }
+    .btn-submit {
+        background-color: var(--text-important);
+        color: var(--bg-dark);
+    }
+    .btn-submit:hover { background-color: var(--text-white); }
+    
     .login-text {
-      margin-top: 32px;
-      font-weight: 700;
-      font-size: 16px;
-      text-align: center;
-      color: #222222;
+        margin-top: 32px;
+        font-weight: 400;
+        font-size: 15px;
+        text-align: center;
+        color: var(--text-secondary);
     }
     .login-text a {
-      font-weight: 400;
-      color: #222222;
-      text-decoration: none;
-      cursor: pointer;
+        font-weight: 600;
+        color: var(--text-important);
+        text-decoration: none;
     }
-    .login-text a:hover,
-    .login-text a:focus {
-      text-decoration: underline;
-      outline: none;
+    .login-text a:hover { text-decoration: underline; }
+    
+    /* Responsive: Kembali ke 1 kolom di layar kecil */
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .form-container {
+            max-width: 100%;
+        }
+        .auth-wrapper {
+            padding: 20px 10px;
+        }
     }
-    @media (max-width: 480px) {
-      .modal {
-        margin: 16px;
-        padding: 24px 24px 32px 24px;
-      }
-      h2 {
-        font-size: 18px;
-        margin-bottom: 24px;
-      }
-      input[type="email"],
-      input[type="password"] {
-        font-size: 14px;
-        padding: 10px 14px;
-        margin-bottom: 20px;
-      }
-      .password-info,
-      ul.password-reqs,
-      .checkbox-container label {
-        font-size: 13px;
-      }
-      button.signup-btn {
-        font-size: 16px;
-        padding: 12px 0;
-      }
-      .login-text {
-        font-size: 14px;
-        margin-top: 24px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <button class="close-btn" aria-label="Close modal" onclick="window.location.href='{{ url('/') }}'">&times;</button>
-    <h2 id="modalTitle">CREATE AN ACCOUNT</h2>
+</style>
 
-    <form method="POST" action="{{ route('register') }}">
-      @csrf
+<div class="auth-wrapper">
+    <div class="form-container">
+        <div class="form-header">
+            <h2 class="form-title">Create an Account</h2>
+            <p class="form-subtitle">Daftar untuk menjadi bagian dari Toko Roti kami.</p>
+        </div>
 
-      <!-- Name -->
-      <input type="text" name="name" placeholder="Full Name*" value="{{ old('name') }}" required />
-      @error('name')
-        <div class="error">{{ $message }}</div>
-      @enderror
+        <form method="POST" action="{{ route('register') }}">
+            @csrf
+            
+            <div class="form-grid">
+                <div class="form-section">
+                    <label for="name" class="form-label required-label">Full Name</label>
+                    <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Masukkan nama lengkap" required autocomplete="name" autofocus>
+                    @error('name')
+                        <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
+                </div>
 
-      <!-- Username -->
-      <input type="text" name="username" placeholder="Username*" value="{{ old('username') }}" required />
-      @error('username')
-        <div class="error">{{ $message }}</div>
-      @enderror
+                <div class="form-section">
+                    <label for="username" class="form-label required-label">Username</label>
+                    <input type="text" name="username" id="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username') }}" placeholder="Masukkan username unik" required autocomplete="username">
+                    @error('username')
+                        <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
+                </div>
+            </div>
 
-      <!-- Email -->
-      <input type="email" name="email" placeholder="Email*" value="{{ old('email') }}" required />
-      @error('email')
-        <div class="error">{{ $message }}</div>
-      @enderror
+            <div class="form-section" style="margin-bottom: 20px;">
+                <label for="email" class="form-label required-label">Email Address</label>
+                <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="contoh@email.com" required autocomplete="email">
+                @error('email')
+                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                @enderror
+            </div>
 
-  <!-- Password -->
-<div style="position: relative;">
-  <input
-    type="password"
-    name="password"
-    id="password"
-    placeholder="Password*"
-    required
-    style="width: 100%; padding-right: 40px;"
-  />
-  <span
-    onclick="togglePasswordVisibility()"
-    style="
-      position: absolute;
-      right: 10px;
-      top: 40%;
-      transform: translateY(-50%);
-      cursor: pointer;
-    "
-    id="togglePasswordIcon"
-  >
-    <!-- Eye icon (visible) -->
-    <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-    </svg>
+            <div class="form-grid">
+                <div class="form-section">
+                    <label for="password" class="form-label required-label">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="Buat password Anda" required autocomplete="new-password">
+                        <span class="password-toggle-icon" onclick="togglePasswordVisibility('password', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>
+                        </span>
+                    </div>
+                    @error('password')
+                        <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
+                </div>
+                
+                <div class="form-section">
+                    <label for="password-confirm" class="form-label required-label">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="password_confirmation" id="password-confirm" class="form-control" placeholder="Ulangi password Anda" required autocomplete="new-password">
+                         <span class="password-toggle-icon" onclick="togglePasswordVisibility('password-confirm', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>
+                        </span>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Eye-off icon (hidden), hidden by default -->
-    <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-      width="24" height="24" style="display: none;">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.042 10.042 0 012.419-4.368m3.076-2.239A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.973 9.973 0 01-1.357 2.572M15 12a3 3 0 11-6 0 3 3 0 016 0zm-9 9l15-15" />
-    </svg>
-  </span>
-</div>
-@error('password')
-  <div class="error" style="color: red;">{{ $message }}</div>
-@enderror
+            <p class="password-info">Password Anda harus berisi:</p>
+            <ul class="password-reqs" id="password-requirements">
+                <li id="req-length">Minimal 8 karakter</li>
+                <li id="req-number">Minimal 1 angka</li>
+                <li id="req-case">Minimal satu huruf besar & kecil</li>
+            </ul>
 
-     <p class="password-info">Your password must contain:</p>
-        <ul class="password-reqs" id="password-requirements" aria-live="polite">
-        <li id="req-length">8 karakter</li>
-        <li id="req-number">1 angka</li>
-        <li id="req-uppercase">Satu huruf besar dan satu huruf kecil</li>
-        </ul>
+            <div class="checkbox-container">
+                <input type="checkbox" id="agree" name="agree" required>
+                <label for="agree">Dengan membuat akun, Anda menyetujui Kebijakan Privasi dan Ketentuan kami. Kami akan mengirimkan Anda informasi terbaru tentang semua hal tentang Toko Roti termasuk perasa, produk baru, dan penawaran khusus! Berhenti berlangganan kapan saja.</label>
+            </div>
 
+            <div class="form-actions">
+                <button type="submit" class="btn-action btn-submit">Sign Up</button>
+            </div>
+        </form>
 
-      <!-- Confirm Password -->
-<div style="position: relative;">
-  <input
-    type="password"
-    name="password_confirmation"
-    id="password_confirmation"
-    placeholder="Confirm Password*"
-    required
-    style="width: 100%; padding-right: 40px;"
-  />
-  <span
-    onclick="toggleConfirmPasswordVisibility()"
-    style="
-      position: absolute;
-      right: 10px;
-      top: 40%;
-      transform: translateY(-50%);
-      cursor: pointer;
-    "
-    id="toggleConfirmPasswordIcon"
-  >
-    <!-- Eye icon (visible) -->
-    <svg id="eyeOpenConfirm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-    </svg>
-
-    <!-- Eye-off icon (hidden) -->
-    <svg id="eyeClosedConfirm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-      width="24" height="24" style="display: none;">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.042 10.042 0 012.419-4.368m3.076-2.239A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.973 9.973 0 01-1.357 2.572M15 12a3 3 0 11-6 0 3 3 0 016 0zm-9 9l15-15" />
-    </svg>
-  </span>
+        <p class="login-text">
+            Already have an account? 
+            <a href="{{ route('login') }}">Log in</a>
+        </p>
+    </div>
 </div>
 
-@error('password_confirmation')
-  <div class="error" style="color: red;">{{ $message }}</div>
-@enderror
-
-
-      <!-- Agree to Terms -->
-      <div class="checkbox-container">
-        <input type="checkbox" id="agree" name="agree" required />
-        <label for="agree">Dengan membuat akun, Anda menyetujui Kebijakan Privasi dan Ketentuan kami. Kami akan mengirimkan Anda informasi terbaru tentang semua hal tentang Toko Roti termasuk perasa, produk baru, dan penawaran khusus! Berhenti berlangganan kapan saja.</label>
-      </div>
-
-      <button type="submit" class="signup-btn">Sign Up</button>
-    </form>
-
-    <p class="login-text">
-      <strong>Already have an account?</strong>
-      <a href="{{ route('login') }}">Log in</a>
-    </p>
-  </div>
-</body>
 <script>
-  const passwordInput = document.getElementById('password');
+    const passwordInput = document.getElementById('password');
+    const reqLength = document.getElementById('req-length');
+    const reqNumber = document.getElementById('req-number');
+    const reqCase = document.getElementById('req-case');
 
-  const reqLength = document.getElementById('req-length');
-  const reqNumber = document.getElementById('req-number');
-  const reqUppercase = document.getElementById('req-uppercase');
-
-  passwordInput.addEventListener('input', function () {
-    const value = passwordInput.value;
-
-    // Cek panjang
-    if (value.length >= 8) {
-      reqLength.style.color = 'green';
-    } else {
-      reqLength.style.color = 'red';
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const value = passwordInput.value;
+            value.length >= 8 ? reqLength.classList.add('valid') : reqLength.classList.remove('valid');
+            /\d/.test(value) ? reqNumber.classList.add('valid') : reqNumber.classList.remove('valid');
+            /[a-z]/.test(value) && /[A-Z]/.test(value) ? reqCase.classList.add('valid') : reqCase.classList.remove('valid');
+        });
     }
 
-    // Cek ada angka
-    if (/\d/.test(value)) {
-      reqNumber.style.color = 'green';
-    } else {
-      reqNumber.style.color = 'red';
+    const eyeSlashIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye-slash-fill" viewBox="0 0 16 16"><path d="m10.79 12.912-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7.029 7.029 0 0 0 2.79-.588zM5.21 3.088A7.028 7.028 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474L5.21 3.089z"/><path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829l-2.83-2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12-.708.708z"/></svg>`;
+    const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>`;
+
+    function togglePasswordVisibility(inputId, iconElement) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            iconElement.innerHTML = eyeSlashIcon;
+        } else {
+            input.type = "password";
+            iconElement.innerHTML = eyeIcon;
+        }
     }
-
-    // Cek huruf besar dan kecil
-    if (/[a-z]/.test(value) && /[A-Z]/.test(value)) {
-      reqUppercase.style.color = 'green';
-    } else {
-      reqUppercase.style.color = 'red';
-    }
-  });
-
-  function togglePasswordVisibility() {
-    const passwordInput = document.getElementById("password");
-    const eyeOpen = document.getElementById("eyeOpen");
-    const eyeClosed = document.getElementById("eyeClosed");
-
-    if (passwordInput.type === "password") {
-      passwordInput.type = "text";
-      eyeOpen.style.display = "none";
-      eyeClosed.style.display = "inline";
-    } else {
-      passwordInput.type = "password";
-      eyeOpen.style.display = "inline";
-      eyeClosed.style.display = "none";
-    }
-  }
-
-  function toggleConfirmPasswordVisibility() {
-    const passwordInput = document.getElementById("password_confirmation");
-    const eyeOpen = document.getElementById("eyeOpenConfirm");
-    const eyeClosed = document.getElementById("eyeClosedConfirm");
-
-    if (passwordInput.type === "password") {
-      passwordInput.type = "text";
-      eyeOpen.style.display = "none";
-      eyeClosed.style.display = "inline";
-    } else {
-      passwordInput.type = "password";
-      eyeOpen.style.display = "inline";
-      eyeClosed.style.display = "none";
-    }
-  }
 </script>
 
-</html>
+@endsection

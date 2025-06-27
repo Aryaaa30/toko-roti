@@ -25,6 +25,8 @@
                         'text-accent': 'rgb(254, 198, 228)',
                         'text-muted': '#b0b0b0',
                         'text-white': '#ffffff',
+                        'pink-primary': 'rgb(254, 198, 228)',
+                        'pink-light': 'rgb(254, 198, 228)',
                     }
                 }
             }
@@ -90,13 +92,16 @@
                 </div>
 
                 <div class="p-6 flex flex-col flex-grow">
-                    {{-- Kustomisasi kue dihapus, kembali ke data dinamis --}}
-                    <h3 class="text-xl font-medium text-text-base mb-2 group-hover:text-text-accent transition-colors">{{ $cake->name }}</h3>
-                    <p class="text-muted text-sm mb-4 flex-grow">{{ Str::limit($cake->description, 100) }}</p>
-                    <p class="text-muted text-sm mb-4">Flavor: {{ $cake->flavor ?? 'Assorted' }}</p>
+                    {{-- Nama produk dengan warna pink --}}
+                    <h3 class="text-xl font-medium text-pink-primary mb-2 group-hover:text-pink-light transition-colors">{{ $cake->name }}</h3>
+                    {{-- Deskripsi dengan warna putih --}}
+                    <p class="text-white text-sm mb-4 flex-grow">{{ Str::limit($cake->description, 100) }}</p>
+                    {{-- Flavor dengan warna putih --}}
+                    <p class="text-white text-sm mb-4">Flavor: {{ $cake->flavor ?? 'Assorted' }}</p>
                     
                     <div class="flex justify-between items-center mt-auto pt-4 border-t border-dark-border">
-                        <span class="text-2xl font-medium text-text-accent">Rp {{ number_format($cake->price, 0, ',', '.') }}</span>
+                        {{-- Harga dengan warna putih --}}
+                        <span class="text-2xl font-medium text-white">Rp {{ number_format($cake->price, 0, ',', '.') }}</span>
                         <span class="text-sm text-muted">Stock: {{ $cake->stok }}</span>
                     </div>
                 </div>
@@ -149,7 +154,7 @@
                     const priceA = parseFloat(a.getAttribute('data-price'));
                     const priceB = parseFloat(b.getAttribute('data-price'));
                     if (sortType === 'price-asc') return priceA - priceB;
-                    if (sortType === 'price-desc') return priceB - a;
+                    if (sortType === 'price-desc') return priceB - priceA;
                     return 0;
                 });
                 
