@@ -775,10 +775,6 @@
       <input type="text" class="search-input" placeholder="Search..." id="searchInput">
     </div>
     
-    <div class="results-info">
-      Showing <span id="resultStart">1</span>-<span id="resultEnd">12</span> of <span id="totalResults">{{ count($menus) }}</span> results
-    </div>
-    
     <div class="sort-container">
       <label for="sortSelect">Sort by:</label>
       <select class="sort-select" id="sortSelect">
@@ -803,25 +799,14 @@
       <div class="sidebar-section">
         <h3>Categories</h3>
         <ul class="category-list">
-          @php
-            $categories = ['Roti Manis', 'Roti Tawar', 'Kue (Cake)', 'Donat', 'Pastry'];
-            $categoryCounts = [];
-            foreach($categories as $cat) {
-              $slug = Str::slug($cat, '-');
-              $count = $menus->where('kategori', $cat)->count();
-              $categoryCounts[$slug] = $count;
-            }
-          @endphp
-          
           <li class="category-item active" data-category="all">
             <span>All Products</span>
-            <span class="category-count">{{ count($menus) }}</span>
+            <span class="category-count">{{ $menus->total() }}</span>
           </li>
-          
           @foreach($categories as $cat)
             @php
               $slug = Str::slug($cat, '-');
-              $count = $categoryCounts[$slug] ?? 0;
+              $count = $categoryCounts[$cat] ?? 0;
             @endphp
             <li class="category-item" data-category="{{ $slug }}">
               <span>{{ $cat }}</span>
@@ -851,30 +836,22 @@
       <!-- Top Products -->
       <div class="sidebar-section">
         <h3>Top product</h3>
-        @php
-          $topProducts = $menus->sortByDesc(function($menu) {
-            return $menu->reviews->avg('rating') ?? 0;
-          })->take(4);
-        @endphp
-        
         @foreach($topProducts as $product)
           <a href="{{ route('menus.show', $product->id) }}" class="top-product-item" data-price="{{ $product->price }}">
             @php
               $image = null;
               if($product->images) {
-                $images = json_decode($product->images);
+                $images = json_decode($product->images, true);
                 $image = is_array($images) && count($images) > 0 ? $images[0] : null;
               } elseif($product->image) {
                 $image = $product->image;
               }
             @endphp
-            
             @if($image)
               <img src="{{ asset('storage/'.$image) }}" alt="{{ $product->name }}" class="top-product-img">
             @else
               <div class="top-product-img" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999;">No Image</div>
             @endif
-            
             <div class="top-product-info">
               <h4>{{ $product->name }}</h4>
               <div class="top-product-price">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
@@ -906,9 +883,8 @@
             $slug = Str::slug($menu->kategori, '-');
             $avgRating = round($menu->reviews->avg('rating'), 1);
             $image = null;
-            
             if($menu->images) {
-              $images = json_decode($menu->images);
+              $images = json_decode($menu->images, true);
               $image = is_array($images) && count($images) > 0 ? $images[0] : null;
             } elseif($menu->image) {
               $image = $menu->image;
@@ -926,7 +902,7 @@
             <div class="product-image-container">
               @if($menu->images)
                 @php
-                  $images = json_decode($menu->images);
+                  $images = json_decode($menu->images, true);
                   $hasMultipleImages = is_array($images) && count($images) > 1;
                 @endphp
                 
@@ -986,15 +962,10 @@
 
       <!-- Pagination -->
       <div class="pagination-container">
-        <div class="pagination" id="pagination">
-          <button class="page-btn" data-action="prev">&laquo;</button>
-          <button class="page-btn active" data-page="1">1</button>
-          <button class="page-btn" data-page="2">2</button>
-          <button class="page-btn" data-page="3">3</button>
-          <button class="page-btn" data-page="4">4</button>
-          <button class="page-btn" data-page="5">5</button>
-          <button class="page-btn" data-action="next">&raquo;</button>
-        </div>
+        {{ $menus->links('pagination.custom-black') }}
+      </div>
+      <div class="results-info" style="text-align:center; margin-top: 10px; color: #fff; font-size: 15px;">
+        Showing {{ $menus->firstItem() }} to {{ $menus->lastItem() }} of {{ $menus->total() }} results
       </div>
     </div>
   </div>
@@ -1130,8 +1101,6 @@ function sortProducts(sortBy) {
   // Re-append sorted products
   products.forEach(product => grid.appendChild(product));
 }
-
-
 
 function toggleView(view, element) {
   // Update active button

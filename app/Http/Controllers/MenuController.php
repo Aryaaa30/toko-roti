@@ -17,51 +17,65 @@ class MenuController extends Controller
    public function index(Request $request)
     {
         $category = $request->query('kategori');
-
-        if (auth()->check() && auth()->user()->is_admin) {
-            // ADMIN: tampilkan semua produk tanpa paginasi
-            if ($category) {
-                $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->get();
-            } else {
-                $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->get();
-            }
-            return view('admin.menu_admin', compact('menus'));
-        } else {
-            // USER: paginasi 9 per halaman
-            if ($category) {
-                $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->paginate(9);
-            } else {
-                $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->paginate(9);
-            }
-            return view('menus.menu_user', [
-                'menus' => $menus,
-                'category' => $category // walaupun null, dikirim tetap
-            ]);
+        $query = Menu::where('kategori', '!=', 'birthday')->with('reviews');
+        if ($category) {
+            $query->where('kategori', $category);
         }
+        $menus = $query->paginate(9);
+
+        // Query untuk top products (tidak mengganggu pagination utama)
+        $topProducts = Menu::where('kategori', '!=', 'birthday')
+            ->with('reviews')
+            ->get()
+            ->sortByDesc(function($menu) {
+                return $menu->reviews->avg('rating') ?? 0;
+            })->take(4);
+
+        // Query untuk category counts
+        $categories = ['Roti Manis', 'Roti Tawar', 'Kue (Cake)', 'Donat', 'Pastry'];
+        $categoryCounts = [];
+        foreach($categories as $cat) {
+            $categoryCounts[$cat] = Menu::where('kategori', $cat)->where('kategori', '!=', 'birthday')->count();
+        }
+
+        return view('menus.menu_user', [
+            'menus' => $menus,
+            'topProducts' => $topProducts,
+            'categoryCounts' => $categoryCounts,
+            'categories' => $categories,
+            'category' => $category
+        ]);
     }
 
     public function bakeries(Request $request)
     {
         $category = $request->query('kategori');
-
-        if (auth()->check() && auth()->user()->is_admin) {
-            if ($category) {
-                $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->get();
-            } else {
-                $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->get();
-            }
-            return view('admin.menu_admin', compact('menus'));
-        } else {
-            if ($category) {
-                $menus = Menu::where('kategori', $category)->where('kategori', '!=', 'birthday')->paginate(9);
-            } else {
-                $menus = Menu::where('kategori', '!=', 'birthday')->with('reviews')->paginate(9);
-            }
-            return view('menus.menu_user', [
-                'menus' => $menus,
-                'category' => $category
-            ]);
+        $query = Menu::where('kategori', '!=', 'birthday')->with('reviews');
+        if ($category) {
+            $query->where('kategori', $category);
         }
+        $menus = $query->paginate(9);
+
+        $topProducts = Menu::where('kategori', '!=', 'birthday')
+            ->with('reviews')
+            ->get()
+            ->sortByDesc(function($menu) {
+                return $menu->reviews->avg('rating') ?? 0;
+            })->take(4);
+
+        $categories = ['Roti Manis', 'Roti Tawar', 'Kue (Cake)', 'Donat', 'Pastry'];
+        $categoryCounts = [];
+        foreach($categories as $cat) {
+            $categoryCounts[$cat] = Menu::where('kategori', $cat)->where('kategori', '!=', 'birthday')->count();
+        }
+
+        return view('menus.menu_user', [
+            'menus' => $menus,
+            'topProducts' => $topProducts,
+            'categoryCounts' => $categoryCounts,
+            'categories' => $categories,
+            'category' => $category
+        ]);
     }
 
     public function show(Menu $menu)
@@ -104,24 +118,30 @@ class MenuController extends Controller
             'available' => 'required|boolean',
             'stok' => 'required|integer|min:0',
             'kategori' => 'required|in:Roti Manis,Roti Tawar,Kue (Cake),Donat,Pastry,birthday',
-            'images.*' => 'nullable|image|max:2048', // validasi setiap gambar
-            'flavor' => 'nullable|string|max:255', // validasi untuk rasa kue
+            'images.*' => 'nullable|image|max:2048',
+            'flavor' => 'nullable|string|max:255',
         ]);
 
         $data = $request->only(['name', 'description', 'price', 'available', 'stok', 'kategori', 'flavor']);
 
-        // Upload dan simpan banyak gambar
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                // Berikan nama unik yang lebih pendek
+                if (!$image->isValid()) {
+                    return back()->withErrors(['images' => 'Gagal upload gambar, file tidak valid.']);
+                }
                 $filename = uniqid('menu_') . '.' . $image->getClientOriginalExtension();
                 $path = $image->storeAs('menus', $filename, 'public');
+                if (!$path) {
+                    return back()->withErrors(['images' => 'Gagal menyimpan gambar ke storage.']);
+                }
                 $imagePaths[] = $path;
             }
+        } else {
+            // Debug jika tidak ada file yang terdeteksi
+            return back()->withErrors(['images' => 'Tidak ada file gambar yang diupload!']);
         }
-
-        $data['images'] = json_encode($imagePaths); // simpan sebagai JSON
+        $data['images'] = json_encode($imagePaths);
 
         $menu = Menu::create($data);
 
