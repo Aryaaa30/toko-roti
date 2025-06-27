@@ -94,4 +94,28 @@ class AdminController extends Controller
             'menuRatings'
         ));
     }
+
+    /**
+     * Display admin menu management page
+     */
+    public function menuAdmin()
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            abort(403, 'Akses ditolak. Hanya admin yang dapat mengakses halaman ini.');
+        }
+
+        // Get all menus with reviews
+        $menus = \App\Models\Menu::with('reviews')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Calculate statistics
+        $stats = [
+            'total' => $menus->count(),
+            'available' => $menus->where('available', 1)->count(),
+            'unavailable' => $menus->where('available', 0)->count(),
+        ];
+
+        return view('admin.menu_admin', compact('menus', 'stats'));
+    }
 }

@@ -106,6 +106,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('orderitems', OrderItemController::class);
     Route::get('/admin/konfirmasi', [App\Http\Controllers\AdminController::class, 'konfirmasi'])->name('admin.konfirmasi');
     Route::get('/admin/reviews', [App\Http\Controllers\AdminController::class, 'reviewAdmin'])->name('admin.reviews');
+    Route::get('/admin/menu', [App\Http\Controllers\AdminController::class, 'menuAdmin'])->name('admin.menu');
 });
 
 // Route khusus untuk pelanggan

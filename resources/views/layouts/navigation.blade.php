@@ -111,7 +111,11 @@
             <!-- Navigation Links -->
             <div class="hidden md:flex items-center space-x-8">
                 <a href="/" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">Home</a>
-                <a href="/bakeries" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">Bakeries</a>
+                @if(auth()->check() && auth()->user()->is_admin)
+                    <a href="{{ route('admin.menu') }}" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">Bakeries</a>
+                @else
+                    <a href="/bakeries" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">Bakeries</a>
+                @endif
                 @if(auth()->check() && auth()->user()->is_admin)
                     <a href="{{ route('birthday.admin') }}" class="text-white hover:text-pink-primary font-medium transition-colors duration-200">Birthday</a>
                 @else
